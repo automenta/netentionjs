@@ -3,20 +3,28 @@
     <head>
         <title><%= agent %></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+        <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+
+        <script type="text/javascript" src="/superfish/js/hoverIntent.js"></script>
+        <script type="text/javascript" src="/superfish/js/superfish.js"></script>
+
+        <link rel="stylesheet" type="text/css" href="/style.css" />
+        <link rel="stylesheet" media="screen" href="/superfish/css/superfish.css" /> 
+        <link rel="stylesheet" media="screen" href="/superfish/css/superfish-vertical.css" /> 
+
+        <script src="/codemirror/lib/codemirror.js"></script>
+        <link rel="stylesheet" href="/codemirror/lib/codemirror.css">
+        <script src="/codemirror/mode/javascript/javascript.js"></script>
+
+        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.css" />
+        <script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
+
     </head>
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
     
-    <script type="text/javascript" src="/superfish/js/hoverIntent.js"></script>
-    <script type="text/javascript" src="/superfish/js/superfish.js"></script>
     
-    <link rel="stylesheet" type="text/css" href="/style.css" />
-    <link rel="stylesheet" media="screen" href="/superfish/css/superfish.css" /> 
-    <link rel="stylesheet" media="screen" href="/superfish/css/superfish-vertical.css" /> 
-
-    <script src="/codemirror/lib/codemirror.js"></script>
-    <link rel="stylesheet" href="/codemirror/lib/codemirror.css">
-    <script src="/codemirror/mode/javascript/javascript.js"></script>
-
     <script>
         var schema, code;
         var types = {};
@@ -74,42 +82,73 @@
         function getProperties(type) {
             return schema.types[type].properties;
         }
+
+        function isCommonProperty(v) {
+            return (v == 'url') || (v == 'description') || (v == 'name') || (v == 'image');
+        }
+        function isDataPropertyType(v) {
+            return (v == 'Integer') || (v == 'URL') || (v=='Text') || (v=='Boolean') || (v=='Geo') || (v=='Float') || (v=='Date') || (v=='DataType') || (v=='Number') || (v=='Thing');
+        }
+        function isSupertype(parent, child) {
+            if (isDataPropertyType(child)) {
+                return false;
+            }
+            var parents = schema.types[child];
+            if (parents==undefined)
+                return false;
+            
+            parents = parents.supertypes;
+            $.each(parents, function(t) {
+                if (t == parent)
+                    return true;
+                if (isSupertype(parent, t))
+                    return true;               
+            });
+            return false;
+        }
         
-        function loadPropertiesMenu(type, forClass, forProp) {
+        function loadPropertiesMenu(type, history) {
+            var MAXDEPTH = 3;
+            
+            if (history == undefined) history = [ type ];
+            var level = history.length - 1;
+            if (level >= MAXDEPTH) return '';
+
             var t = '';
             var props = getProperties(type);
             
-            
             $.each(props, function(k, v) {
-                if ((v == 'url') || (v == 'description') || (v == 'name') || (v == 'image')) {
-                    
+                if (isCommonProperty(v)) {
+                    //do not add
                 }
                 else if (schema.properties[v].comment.indexOf('legacy spelling')!=-1) {
                     
                 }
                 else {
-                    var vv, tv = schema.properties[v].label;
-                    if (forProp!=null) {
-                        vv = forProp + '/' + v;
-                        tv = forClass + '/' + v;
-                    }
-                    else {
-                        vv = v;
-                    }
-                    var xp = vv;
-                    if (forClass != null) {
-                        xp = forClass + '/' + vv;
-                    }
+                    var label = schema.properties[v].label;
+                    var range = schema.properties[v].ranges[0];
                     
-                    t += '<li><a href="javascript:addProperty(\'' + xp + '\')">' + tv + '</a></li>';
+                    if (isDataPropertyType(range))  {
+                        t += '<li><a href="javascript:addProperty(\'' + v + '\', \'' + history + '\')">' + label + '</a></li>';                        
+                    }
+                    else if (level < MAXDEPTH-1) {
+                        if (!isSupertype(type, range)) {
+                            if (schema.types[range].properties.length > 0) {
+                                history.push(v);
+                                t += '<li>' + label + loadPropertiesMenu(range, history) + "</li>";
+                                history.pop();
+                            }
+                        }
+                    }
                 }
             });
-            t += '<li><a href="javascript:removeType(\'' + type + '\')"><i>Remove</i></a></li>';
+            if (level == 0)
+                t += '<li><a href="javascript:removeType(\'' + type + '\')"><i>Remove</i></a></li>';
             return '<ul> ' + t + '</ul>';
         }
         
         function isDataType(t) {
-            return (t == 'Text') || (t == 'Boolean') || (t == 'URL') || (t == 'Integer') || (t == 'Float') || (t == 'Number') || (t == 'Date');
+            return (t == 'Text') || (t == 'Boolean') || (t == 'URL') || (t == 'Integer') || (t == 'Float') || (t == 'Number') || (t == 'Date') || (t=='Thing');
         }
         
         function addProperty(tt) {
@@ -138,12 +177,13 @@
                 var tl = code.lineCount()-1;
 
                 code.setLine(tl, code.getLine(tl) + prefix + newLine);
+                code.refresh();
                 code.focus();
 
                 source.focus();                
             }
             else {
-                addType(range, null, null);
+                console.log('can not add property: ' + tt);
             }
         }
         
@@ -154,7 +194,7 @@
                 if (forProp!=null) {
                     p = forProp + '/';
                 }
-                $('#EditMenu').append('<li><a href="#">' + p + v.label + '</a>' + loadPropertiesMenu(t, forClass, forProp) + '</li>');
+                $('#EditMenu').append('<li><a href="#">' + p + v.label + '</a>' + loadPropertiesMenu(t) + '</li>');
                 $('ul.sf-menu').superfish();
             }
             types[t] = true;
@@ -177,16 +217,16 @@
                     var name = prop.label;
                     var comment = prop.comment;
                     var type = prop.ranges[0];
-                    status.html('<b>' + name + '(' + p + ': ' + type + ')</b><br/>' + comment);
+                    status.html('<b>' + name + '(' + p + ': ' + type + ')</b><br/>' + comment + '<br>Suggested Values: [not implemented yet]' );
                 }
             }
             else {
                 status.html('');
             }
+            //TODO colorize lines
         }
         
         function newNode() {
-            $('#EditNode').show();
             code = CodeMirror.fromTextArea(document.getElementById('NodeSource'), {
                 value: 'Name\n',
                 mode:  "javascript",
@@ -208,14 +248,16 @@
             
             $('#EditMenu').append('<li><a href="#">[+]</a>' + loadTypeMenu(null, getSchemaRoots()) + '</li>');
             
-            $(document).ready(function() { 
-                $('ul.sf-menu').superfish( {
-                        delay:       0,                            // one second delay on mouseout 
-                        animation:   {opacity:'show',height:'show'},  // fade-in and slide-down animation 
-                        speed:       'fast'                          // faster animation speed                     
-                });
+            $('ul.sf-menu').superfish( {
+                    delay:       0,                            // one second delay on mouseout 
+                    animation:   {opacity:'show',height:'show'},  // fade-in and slide-down animation 
+                    speed:       'fast'                          // faster animation speed                     
             });
+            
+           $('#content').show();
  
+           code.refresh();
+           code.focus();
         }
 
         
@@ -239,7 +281,7 @@
          
     </script>
     <style>
-        #EditNode {
+        #content {
             display: none;
             margin-left: 5em;
             margin-right: 5em;
@@ -276,23 +318,79 @@
             font-weight: bold;
         }
         #Status {
-            clear:both;
+            float:left;
+        }
+        #EditButtons {
+            float: right;
+        }
+        .CodeMirror {
+            line-height: 1.5em;
+            font-family: "monospace", arial, sans;
+            font-size: 2em;
+        }
+        #listArea {
+            float: left;
+            width: 22%;
+            margin-top: 1em;
+        }
+        #contentArea {
+            float: right;
+            width: 75%;
+        }
+        #listArea ul {
+            width: 100%;
+        }
+        .ui-listview-filter .ui-input-search  {
+            margin-bottom: 1em;
+        }
+        .ui-body-c, .ui-overlay-c {
+            text-shadow: none;
         }
     </style>
     
     <body>
-        <h1><%= agent %></h1>
-        <div id="EditNode">
         
-            <div id="EditMenuBar">
-                <ul id="EditMenu" class="sf-menu sf-js-enabled xsf-shadow">
-                </ul>            
-            </div>
+        <div data-role="page">
+            <div data-role="header">
+                <h1><%= agent %></h1>
+                <a href="/" data-icon="home" data-role="button" rel=external></a>
+            </div><!-- /header -->
 
-                <div id="EditMenuArea">
-                    <textarea id="NodeSource" rows="7"></textarea>
+            <div id="content">
+
+                <div id="listArea">
+                    <div data-role="navbar">
+                            <ul>
+                                    <li><a href="#" class="ui-btn-active ui-state-persist">Name</a></li>
+                                    <li><a href="#">When</a></li>
+                                    <li><a href="#">Where</a></li>
+                            </ul>
+                    </div><!-- /navbar -->
+                    <br/>
+                    <ul data-role="listview" data-filter="true" data-inset="true" data-filter-placeholder='' ui-li-icon="">
+                        <li><a href="#">A</a></li>
+                        <li><a href="#">B</a></li>
+                        <li><a href="#">C</a></li>
+                        <li><a href="#">D</a></li>
+                        <li><a href="#">E</a></li>
+                    </ul>
                 </div>
-            <div id="Status"></div>
+                <div id="contentArea">
+                    <div id="EditMenuBar">
+                        <ul id="EditMenu" class="sf-menu sf-js-enabled xsf-shadow">
+                        </ul>            
+                    </div>
+
+                        <div id="EditMenuArea">
+                            <textarea id="NodeSource" rows="7"></textarea>
+                        </div>
+                    <div id="Status"></div>
+                    <div id="EditButtons">
+                        <a href="index.html" data-role="button" data-icon="delete" alt="Delete"></a>
+                        <a href="index.html" data-role="button" data-icon="check" alt="Update"></a>
+                    </div>
+                </div>
+            </div>
         </div>
         
     </body>

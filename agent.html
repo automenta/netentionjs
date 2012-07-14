@@ -22,12 +22,15 @@
         <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.css" />
         <script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
 
+        <link rel="stylesheet" type="text/css" href="/gritter/css/jquery.gritter.css" />
+        <script type="text/javascript" src="/gritter/js/jquery.gritter.js"></script>
     </head>
     
     
     <script>
         var schema, code;
         var types = {};
+        var isNew = true;
         
         function getSchemaRoots() {
             var roots = { };
@@ -258,6 +261,12 @@
  
            code.refresh();
            code.focus();
+
+
+            $.gritter.add({
+                    title: 'Editing a New Node',
+                    text: 'Ready.'
+            });
         }
 
         
@@ -267,15 +276,43 @@
                whenSchemaLoaded();
             });            
         }
+
+        function getEditedNode() {
+            code.save();
+            
+            return {
+                content: code.getTextArea().value
+            };
+        }
+        
+        function updateNode() {
+            if (isNew) {
+                var g = $.gritter.add({
+                        title: 'Saving New Node',
+                        text: 'Standby...'
+                });
+                
+                $.post('/agent/<%= agent %>/newnode', 
+                  { node: getEditedNode() },
+                  function(data) {
+                    $.gritter.remove(g);
+                    $.gritter.add({
+                            title: 'Saved',
+                            text: 'Result: ' + data
+                    });
+                });
+            }
+        }        
         
         $(document).ready(function(){
+            $.extend($.gritter.options, { 
+                    position: 'bottom-right', // defaults to 'top-right' but can be 'bottom-left', 'bottom-right', 'top-left', 'top-right' (added in 1.7.1)
+                    fade_in_speed: 'medium', // how fast notifications fade in (string or int)
+                    fade_out_speed: 2000, // how fast the notices fade out
+                    time: 6000 // hang on the screen for...
+            });        
             loadSchema(function() {
                 newNode();                
-//                $('#NodeSource').keyup(function(e) {
-//                    if (e.which == 13) { /* enter */ }
-//                    if (e.which == 27) { /* escape */ }
-//                    onSourceModified($('#NodeSource').html());
-//                });
             });
         });
          
@@ -285,15 +322,19 @@
             display: none;
             margin-left: 5em;
             margin-right: 5em;
+            margin-top: 1em;
         }
         #EditMenuBar {
             float: left; 
             width: 100%;
+            border-top: 1px solid gray;
+            border-left: 1px solid gray;
+            border-right: 1px solid gray;
         }
         #EditMenuArea {
             float: left; 
             width: 100%;
-            border: 2px solid gray;
+            border: 1px solid gray;
             clear:both;
         }
         #NodeSource {
@@ -326,12 +367,11 @@
         .CodeMirror {
             line-height: 1.5em;
             font-family: "monospace", arial, sans;
-            font-size: 2em;
+            font-size: 1.5em;
         }
         #listArea {
             float: left;
             width: 22%;
-            margin-top: 1em;
         }
         #contentArea {
             float: right;
@@ -376,18 +416,19 @@
                     </ul>
                 </div>
                 <div id="contentArea">
+
                     <div id="EditMenuBar">
                         <ul id="EditMenu" class="sf-menu sf-js-enabled xsf-shadow">
                         </ul>            
                     </div>
-
-                        <div id="EditMenuArea">
-                            <textarea id="NodeSource" rows="7"></textarea>
-                        </div>
+                    <div id="EditMenuArea">
+                        <textarea id="NodeSource" rows="7"></textarea>
+                    </div>
+                    
                     <div id="Status"></div>
                     <div id="EditButtons">
-                        <a href="index.html" data-role="button" data-icon="delete" alt="Delete"></a>
-                        <a href="index.html" data-role="button" data-icon="check" alt="Update"></a>
+                        <a href="" data-role="button" data-icon="delete" alt="Delete"></a>
+                        <a href="javascript:updateNode()" data-role="button" data-icon="check" alt="Update"></a>
                     </div>
                 </div>
             </div>

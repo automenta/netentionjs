@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title><%= agent %></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+    
+    <script type="text/javascript" src="/superfish/js/hoverIntent.js"></script>
+    <script type="text/javascript" src="/superfish/js/superfish.js"></script>
+    
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="stylesheet" media="screen" href="/superfish/css/superfish.css" /> 
+    <link rel="stylesheet" media="screen" href="/superfish/css/superfish-vertical.css" /> 
+
+    <script src="/codemirror/lib/codemirror.js"></script>
+    <link rel="stylesheet" href="/codemirror/lib/codemirror.css">
+    <script src="/codemirror/mode/javascript/javascript.js"></script>
+
+    <script>
+        var schema, code;
+        var types = {};
+        
+        function getSchemaRoots() {
+            var roots = { };
+            $.each(schema.types, function(k, v) {
+                if (v.ancestors.length == 1) {
+                    if (v.ancestors[0] == 'Thing')
+                        roots[k] = v;
+                }
+            });
+            return roots;            
+        }
+        function getSchemaChildren(parent) {
+            var roots = { };
+            var count = 0;
+            var maxItems = 500;
+            $.each(schema.types, function(k, v) {
+                for (var i = 0; i < v.ancestors.length; i++) {
+                    if (v.ancestors[i] == parent) {                        
+                        roots[k] = v;
+                        count++;
+                    }
+                    if (count > maxItems)
+                        return roots;
+                }
+            });
+            return roots;                        
+        }
+        
+        function loadTypeMenu(parent, children) {
+            if (parent!=null)
+                if (children.length == 0)
+                    if (schema.types[parent].properties.length < 1)
+                        return '';
+            
+            var s = '';
+                $.each(children, function(k, v) {
+                    var sc = getSchemaChildren(k);
+                    var scLen = Object.keys(sc).length;
+                    //s+= '<li><a href="#">' + k + ' ' + scLen + '</a></li>';
+
+                    var tt = '';
+                    if (scLen > 0) {               
+                        tt = loadTypeMenu(k, sc);
+                    }
+                    s+= '<li><a href="javascript:addType(\'' + k + '\', null)">' + v.label + '</a>' + tt + '</li>';
+                });
+                
+                return '<ul>' + s + '</ul>';
+            
+        }
+        
+        function getProperties(type) {
+            return schema.types[type].properties;
+        }
+        
+        function loadPropertiesMenu(type, forProp) {
+            var t = '';
+            var props = getProperties(type);
+            
+            $.each(props, function(k, v) {
+                if ((v == 'url') || (v == 'description') || (v == 'name') || (v == 'image')) {
+                    
+                }
+                else if (schema.properties[v].comment.indexOf('legacy spelling')!=-1) {
+                    
+                }
+                else {
+                    var vv;
+                    if (forProp!=null)
+                        vv = forProp + '/';
+                    else
+                        vv = v;
+                    
+                    t += '<li><a href="javascript:addProperty(\'' + vv + '\')">' + v + '</a></li>';
+                }
+            });
+            t += '<li><a href="javascript:removeType(\'' + type + '\')"><i>Remove</i></a></li>';
+            return '<ul> ' + t + '</ul>';
+        }
+        
+        function isDataType(t) {
+            return (t == 'Text') || (t == 'Boolean') || (t == 'URL') || (t == 'Integer') || (t == 'Float') || (t == 'Number') || (t == 'Date');
+        }
+        
+        function addProperty(tt) {
+            var t = tt;
+            if (tt.indexOf('/')!=-1) {
+                t = tt.substring(0, tt.indexOf('/'));
+            }
+            var prop = schema.properties[t];
+            
+            //TODO handle multiple range types
+            var range = prop.ranges[0];
+            
+            if (isDataType(range)) {
+                var source = $('#NodeSource');
+
+                var newLine = t + ': ';
+
+                var line = code.getLine(code.lineCount()-1);
+                var prefix;
+                if (line.length > 0)
+                    prefix = '\n';
+                else
+                    prefix = '';
+
+                var tl = code.lineCount()-1;
+
+                code.setLine(tl, code.getLine(tl) + prefix + newLine);
+                code.focus();
+
+                source.focus();                
+            }
+            else {
+                addType(range, t);
+            }
+        }
+        
+        function addType(t, propertyPrefix) {
+            if (types[t] == undefined) {
+                var v = schema.types[t];
+                var p = '';
+                if (propertyPrefix!=null) {
+                    p = propertyPrefix + '/';
+                }
+                $('#EditMenu').append('<li><a href="#">' + p + v.label + '</a>' + loadPropertiesMenu(t, propertyPrefix) + '</li>');
+                $('ul.sf-menu').superfish();
+            }
+            types[t] = true;
+        }
+        
+        function updateCode(from, to, text, next) {
+            var currentLine = code.getCursor().line;     
+            var line = code.getLine(currentLine);
+            var status = $('#Status');
+            if (currentLine == 0) {
+                status.html("Enter a name for this object on the first line.");                
+            }
+            else if (line.indexOf(':')!=-1) {
+                var p = line.substring(0, line.indexOf(':'));
+                var prop = schema.properties[p];
+                if (prop == undefined) {
+                    status.html('Property "' + p + '" not defined.  Did you mean...');
+                }
+                else {
+                    var name = prop.label;
+                    var comment = prop.comment;
+                    var type = prop.ranges[0];
+                    status.html('<b>' + name + '(' + p + ': ' + type + ')</b><br/>' + comment);
+                }
+            }
+            else {
+                status.html('');
+            }
+        }
+        
+        function newNode() {
+            $('#EditNode').show();
+            code = CodeMirror.fromTextArea(document.getElementById('NodeSource'), {
+                value: 'Name\n',
+                mode:  "javascript",
+                autofocus: true,
+                theme: 'default',
+                smartIndent: false,
+                onCursorActivity: updateCode
+            });
+            code.setLine(0, 'Name\n');
+            code.setLineClass(0, 'firstLine', '');
+            
+            //$('#NodeSource').html('Name\n');
+            
+//            var a = $('#AddTypeMenuItem');
+//            $.each(getSchemaRoots(), function(k, v) {
+//               a.append('<li>' + k + ':' + schema.types[k] + '<ul>' + loadMenu(k) + '</ul></li>');
+//            });
+            //$('#AddTypeMenuItem').append(loadMenu(null));
+            
+            $('#EditMenu').append('<li><a href="#">Add Type</a>' + loadTypeMenu(null, getSchemaRoots()) + '</li>');
+            
+            $(document).ready(function() { 
+                $('ul.sf-menu').superfish( {
+                        delay:       0,                            // one second delay on mouseout 
+                        animation:   {opacity:'show',height:'show'},  // fade-in and slide-down animation 
+                        speed:       'fast'                          // faster animation speed                     
+                });
+            });
+ 
+        }
+
+        
+        function loadSchema(whenSchemaLoaded) {
+            $.getJSON('/schema.org.json', function(data) {
+               schema = data; 
+               whenSchemaLoaded();
+            });            
+        }
+        
+        $(document).ready(function(){
+            loadSchema(function() {
+                newNode();                
+//                $('#NodeSource').keyup(function(e) {
+//                    if (e.which == 13) { /* enter */ }
+//                    if (e.which == 27) { /* escape */ }
+//                    onSourceModified($('#NodeSource').html());
+//                });
+            });
+        });
+         
+    </script>
+    <style>
+        #EditNode {
+            width: 75%;
+            display: none;
+        }
+        #EditMenuBar {
+            float: left; 
+            width: 30%;
+        }
+        #EditMenuArea {
+            float: left; 
+            width: 30%;
+            border: 2px solid gray;
+        }
+        #NodeSource {
+            width: 100%;
+            height: 300px;
+            font-size: 150%;
+        }
+        .sf-menu li { 
+            padding: 0.5em;
+        }
+        
+        .firstLine {
+            font-weight: bold;
+        }
+        #Status {
+            clear:both;
+        }
+    </style>
+    
+    <body>
+        <h1><%= agent %></h1>
+        
+        <div id="EditNode">
+            <div id="EditMenuBar">
+                <ul id="EditMenu" class="sf-menu sf-js-enabled sf-shadow sf-vertical">
+                </ul>            
+            </div>
+            <div id="EditMenuArea">
+                <textarea id="NodeSource" rows="7"></textarea>
+            </div>
+        </div>
+        <div id="Status"></div>
+        <br/>
+        
+    </body>
+</html>

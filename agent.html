@@ -64,7 +64,7 @@
                     if (scLen > 0) {               
                         tt = loadTypeMenu(k, sc);
                     }
-                    s+= '<li><a href="javascript:addType(\'' + k + '\', null)">' + v.label + '</a>' + tt + '</li>';
+                    s+= '<li><a href="javascript:addType(\'' + k + '\', null, null)">' + v.label + '</a>' + tt + '</li>';
                 });
                 
                 return '<ul>' + s + '</ul>';
@@ -75,9 +75,10 @@
             return schema.types[type].properties;
         }
         
-        function loadPropertiesMenu(type, forProp) {
+        function loadPropertiesMenu(type, forClass, forProp) {
             var t = '';
             var props = getProperties(type);
+            
             
             $.each(props, function(k, v) {
                 if ((v == 'url') || (v == 'description') || (v == 'name') || (v == 'image')) {
@@ -87,13 +88,20 @@
                     
                 }
                 else {
-                    var vv;
-                    if (forProp!=null)
-                        vv = forProp + '/';
-                    else
+                    var vv, tv = schema.properties[v].label;
+                    if (forProp!=null) {
+                        vv = forProp + '/' + v;
+                        tv = forClass + '/' + v;
+                    }
+                    else {
                         vv = v;
+                    }
+                    var xp = vv;
+                    if (forClass != null) {
+                        xp = forClass + '/' + vv;
+                    }
                     
-                    t += '<li><a href="javascript:addProperty(\'' + vv + '\')">' + v + '</a></li>';
+                    t += '<li><a href="javascript:addProperty(\'' + xp + '\')">' + tv + '</a></li>';
                 }
             });
             t += '<li><a href="javascript:removeType(\'' + type + '\')"><i>Remove</i></a></li>';
@@ -105,11 +113,12 @@
         }
         
         function addProperty(tt) {
-            var t = tt;
+            var t = '', s = tt;
             if (tt.indexOf('/')!=-1) {
                 t = tt.substring(0, tt.indexOf('/'));
+                s = tt.substring(tt.indexOf('/')+1, tt.length);
             }
-            var prop = schema.properties[t];
+            var prop = schema.properties[s];
             
             //TODO handle multiple range types
             var range = prop.ranges[0];
@@ -117,7 +126,7 @@
             if (isDataType(range)) {
                 var source = $('#NodeSource');
 
-                var newLine = t + ': ';
+                var newLine = s + ': ';
 
                 var line = code.getLine(code.lineCount()-1);
                 var prefix;
@@ -134,18 +143,18 @@
                 source.focus();                
             }
             else {
-                addType(range, t);
+                addType(range, null, null);
             }
         }
         
-        function addType(t, propertyPrefix) {
+        function addType(t, forClass, forProp) {
             if (types[t] == undefined) {
                 var v = schema.types[t];
                 var p = '';
-                if (propertyPrefix!=null) {
-                    p = propertyPrefix + '/';
+                if (forProp!=null) {
+                    p = forProp + '/';
                 }
-                $('#EditMenu').append('<li><a href="#">' + p + v.label + '</a>' + loadPropertiesMenu(t, propertyPrefix) + '</li>');
+                $('#EditMenu').append('<li><a href="#">' + p + v.label + '</a>' + loadPropertiesMenu(t, forClass, forProp) + '</li>');
                 $('ul.sf-menu').superfish();
             }
             types[t] = true;
@@ -197,7 +206,7 @@
 //            });
             //$('#AddTypeMenuItem').append(loadMenu(null));
             
-            $('#EditMenu').append('<li><a href="#">Add Type</a>' + loadTypeMenu(null, getSchemaRoots()) + '</li>');
+            $('#EditMenu').append('<li><a href="#">[+]</a>' + loadTypeMenu(null, getSchemaRoots()) + '</li>');
             
             $(document).ready(function() { 
                 $('ul.sf-menu').superfish( {
@@ -231,25 +240,36 @@
     </script>
     <style>
         #EditNode {
-            width: 75%;
             display: none;
+            margin-left: 5em;
+            margin-right: 5em;
         }
         #EditMenuBar {
             float: left; 
-            width: 30%;
+            width: 100%;
         }
         #EditMenuArea {
             float: left; 
-            width: 30%;
+            width: 100%;
             border: 2px solid gray;
+            clear:both;
         }
         #NodeSource {
             width: 100%;
             height: 300px;
             font-size: 150%;
         }
+        .sf-menu {
+            margin-bottom: 0px;
+        }
         .sf-menu li { 
             padding: 0.5em;
+        }
+        #EditMenuBar {
+            background-color: #eee;            
+        }
+        #EditMenuBar li { 
+            padding-bottom: 1.0em;
         }
         
         .firstLine {
@@ -262,18 +282,18 @@
     
     <body>
         <h1><%= agent %></h1>
-        
         <div id="EditNode">
+        
             <div id="EditMenuBar">
-                <ul id="EditMenu" class="sf-menu sf-js-enabled sf-shadow sf-vertical">
+                <ul id="EditMenu" class="sf-menu sf-js-enabled xsf-shadow">
                 </ul>            
             </div>
-            <div id="EditMenuArea">
-                <textarea id="NodeSource" rows="7"></textarea>
-            </div>
+
+                <div id="EditMenuArea">
+                    <textarea id="NodeSource" rows="7"></textarea>
+                </div>
+            <div id="Status"></div>
         </div>
-        <div id="Status"></div>
-        <br/>
         
     </body>
 </html>

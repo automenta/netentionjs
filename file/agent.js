@@ -251,10 +251,15 @@ function editNode(id) {
 
    $('#editArea').show();
 
-
-
 }
 
+function viewNode(n) {
+    $.getJSON('/node/' + n + '/json', function(data) {
+        _n(data);
+        showNode(0);
+    });
+        
+}
 
 function loadSchema(whenSchemaLoaded) {
     $.getJSON('/schema.org.json', function(data) {
@@ -308,14 +313,14 @@ function updateNode() {
     });
 }        
 
-function loadNodes() {
+function loadNodes(target) {
     $.getJSON('/agent/' + agentID + '/nodes', function(data) {
-        $('#listAreaList').html('');
+        $(target).html('');
         for (var i = 0; i < data.length; i++) {
             var nodeID = data[i];
             $.getJSON('/node/' + nodeID + '/json', function(data) {
                 var title = data.content.split('\n')[0];
-                $('#listAreaList').append('<li><a href="/agent/' + agentID + '/' + data._id + '">' + title + "</a></i>");
+                $(target).append('<li><a href="/agent/' + agentID + '/' + data._id + '">' + title + "</a></i>");
             });
         }
     });
@@ -340,7 +345,7 @@ $(document).ready(function(){
     });
 
     loadSchema(function() {
-        loadNodes();
+        //loadNodes('#listAreaList');
         onStart();
     });
     

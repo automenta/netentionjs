@@ -89,7 +89,7 @@
         var content, title;
 
         if (node != null) {
-            content = node.prop['content'];
+            content = node.content
             if (content == null)
                 content = '';
             if (node.name == null)

@@ -60,7 +60,7 @@ server.get('/agent/:agent/nodes', function(req,res) {
 useTemplate('/agent/:agent/:node', 'agent.html', function(data, req, res) {
     var agentID = req.params.agent;
     var nodeID = req.params.node;
-    sendAgentPage(data, res, agentID, 'editNode(\'' + nodeID + '\');');
+    sendAgentPage(data, res, agentID, 'viewNode(\'' + nodeID + '\');');
 });
 
 server.post('/agent/:agent/updatenode', function(req,res) {

@@ -19,8 +19,10 @@
         <link rel="stylesheet" href="/codemirror/lib/codemirror.css">
         <script src="/codemirror/mode/javascript/javascript.js"></script>
 
+        <!--
         <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.css" />
         <script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
+        -->
 
         <link rel="stylesheet" type="text/css" href="/gritter/css/jquery.gritter.css" />
         <script type="text/javascript" src="/gritter/js/jquery.gritter.js"></script>
@@ -30,7 +32,9 @@
     <script>
         var schema, code;
         var types = {};
-        var isNew = true;
+        var agentID = '<%= agent._id %>';
+        var nodeID, node = { };
+        var code;
         
         function getSchemaRoots() {
             var roots = { };
@@ -229,18 +233,39 @@
             //TODO colorize lines
         }
         
-        function newNode() {
-            code = CodeMirror.fromTextArea(document.getElementById('NodeSource'), {
-                value: 'Name\n',
-                mode:  "javascript",
-                autofocus: true,
-                theme: 'default',
-                smartIndent: false,
-                onCursorActivity: updateCode
-            });
-            code.setLine(0, 'Name\n');
-            code.setLineClass(0, 'firstLine', '');
+        
+        function editNode(id) {            
+            nodeID = id;
             
+
+            if (nodeID!=null) {
+                $.getJSON('/node/' + nodeID + '/json', function(data) {
+                    node = data;
+                    console.log(node);
+                    code.setValue( node.content );
+                    
+                    for (var i = 0; i < node.types.length; i++) {
+                        var t = node.types[i];
+                        addType(t);
+                    }
+                });
+                $.gritter.add({
+                        title: 'Editing Node: ' + nodeID,
+                        text: 'Ready.'
+                });
+            }
+            else {
+                code.setValue('Name\n');
+                $.gritter.add({
+                        title: 'Editing a New Node',
+                        text: 'Ready.'
+                });
+            }
+
+            code.setLineClass(0, 'firstLine', '');
+            code.refresh();
+            code.focus();
+             
             //$('#NodeSource').html('Name\n');
             
 //            var a = $('#AddTypeMenuItem');
@@ -249,7 +274,7 @@
 //            });
             //$('#AddTypeMenuItem').append(loadMenu(null));
             
-            $('#EditMenu').append('<li><a href="#">[+]</a>' + loadTypeMenu(null, getSchemaRoots()) + '</li>');
+            $('#EditMenu').html('<li><a href="#">[+]</a>' + loadTypeMenu(null, getSchemaRoots()) + '</li>');
             
             $('ul.sf-menu').superfish( {
                     delay:       0,                            // one second delay on mouseout 
@@ -257,16 +282,10 @@
                     speed:       'fast'                          // faster animation speed                     
             });
             
-           $('#content').show();
+           $('#editArea').show();
  
-           code.refresh();
-           code.focus();
 
 
-            $.gritter.add({
-                    title: 'Editing a New Node',
-                    text: 'Ready.'
-            });
         }
 
         
@@ -277,49 +296,91 @@
             });            
         }
 
-        function getEditedNode() {
+        function commitNode() {
             code.save();
+            if (nodeID!=undefined)
+                node._id = nodeID;
+            node.content = code.getTextArea().value;
             
-            return {
-                content: code.getTextArea().value
-            };
+            var typesList = [];
+            $.each(types, function(k, v) {
+                typesList.push(k);
+            });
+            node.types = typesList;
+            
+            return node;
+        }
+
+        function deleteNode() {
+            var r=confirm("Delete this node?");
+            if (r) {
+                $.getJSON('/node/' + nodeID + '/remove', function(data) {
+                    editNode(null);
+                    loadNodes();
+                });
+            }
         }
         
         function updateNode() {
-            if (isNew) {
-                var g = $.gritter.add({
-                        title: 'Saving New Node',
-                        text: 'Standby...'
+            var g = $.gritter.add({
+                    title: 'Saving New Node',
+                    text: 'Standby...'
+            });
+
+            $.post('/agent/<%= agent._id %>/updatenode', 
+              { 'node': commitNode() },
+              function(data) {
+                $.gritter.remove(g);
+                $.gritter.add({
+                        title: 'Saved',
+                        text: 'Result: ' + data
                 });
-                
-                $.post('/agent/<%= agent %>/newnode', 
-                  { node: getEditedNode() },
-                  function(data) {
-                    $.gritter.remove(g);
-                    $.gritter.add({
-                            title: 'Saved',
-                            text: 'Result: ' + data
-                    });
-                });
-            }
+                nodeID = data;
+                node._id = nodeID;
+                loadNodes();
+            });
         }        
+        
+        function loadNodes() {
+            $.getJSON('/agent/' + agentID + '/nodes', function(data) {
+                $('#listAreaList').html('');
+                for (var i = 0; i < data.length; i++) {
+                    var nodeID = data[i];
+                    $.getJSON('/node/' + nodeID + '/json', function(data) {
+                        var title = data.content.split('\n')[0];
+                        $('#listAreaList').append('<li><a href="/agent/' + agentID + '/' + data._id + '">' + title + "</a></i>");
+                    });
+                }
+            });
+            
+        }
         
         $(document).ready(function(){
             $.extend($.gritter.options, { 
                     position: 'bottom-right', // defaults to 'top-right' but can be 'bottom-left', 'bottom-right', 'top-left', 'top-right' (added in 1.7.1)
                     fade_in_speed: 'medium', // how fast notifications fade in (string or int)
                     fade_out_speed: 2000, // how fast the notices fade out
-                    time: 6000 // hang on the screen for...
+                    time: 4000 // hang on the screen for...
             });        
+            
+            code = CodeMirror.fromTextArea(document.getElementById('NodeSource'), {
+                value: 'Name\n',
+                mode:  "javascript",
+                autofocus: true,
+                theme: 'default',
+                smartIndent: false,
+                onCursorActivity: updateCode
+            });
+
             loadSchema(function() {
-                newNode();                
+                loadNodes();
+                <%= onStart %>
             });
         });
          
     </script>
     <style>
         #content {
-            display: none;
             margin-left: 5em;
             margin-right: 5em;
             margin-top: 1em;
@@ -375,7 +436,7 @@
         }
         #contentArea {
             float: right;
-            width: 75%;
+            width: 71%;
         }
         #listArea ul {
             width: 100%;
@@ -386,49 +447,48 @@
         .ui-body-c, .ui-overlay-c {
             text-shadow: none;
         }
+        #editArea, #viewArea {
+            display: none;
+        }
     </style>
     
     <body>
         
-        <div data-role="page">
-            <div data-role="header">
-                <h1><%= agent %></h1>
-                <a href="/" data-icon="home" data-role="button" rel=external></a>
+        <div>
+            <div >
+                <h1><%= agent._id %></h1>
+                <a href="/" data-icon="home" data-role="button" rel=external>Home</a>
             </div><!-- /header -->
 
             <div id="content">
 
                 <div id="listArea">
-                    <div data-role="navbar">
-                            <ul>
-                                    <li><a href="#" class="ui-btn-active ui-state-persist">Name</a></li>
-                                    <li><a href="#">When</a></li>
-                                    <li><a href="#">Where</a></li>
-                            </ul>
-                    </div><!-- /navbar -->
-                    <br/>
-                    <ul data-role="listview" data-filter="true" data-inset="true" data-filter-placeholder='' ui-li-icon="">
-                        <li><a href="#">A</a></li>
-                        <li><a href="#">B</a></li>
-                        <li><a href="#">C</a></li>
-                        <li><a href="#">D</a></li>
-                        <li><a href="#">E</a></li>
+                    <a href="#">Name</a>
+                    <a href="#">When</a>
+                    <a href="#">Where</a>
+                    <br/>                    
+                    <ul id="listAreaList">
                     </ul>
                 </div>
                 <div id="contentArea">
 
-                    <div id="EditMenuBar">
-                        <ul id="EditMenu" class="sf-menu sf-js-enabled xsf-shadow">
-                        </ul>            
+                    <div id="editArea">
+                        <div id="EditMenuBar">
+                            <ul id="EditMenu" class="sf-menu sf-js-enabled xsf-shadow">
+                            </ul>            
+                        </div>
+                        <div id="EditMenuArea">
+                            <textarea id="NodeSource" rows="7"></textarea>
+                        </div>
+
+                        <div id="Status"></div>
+                        
+                        <div id="EditButtons">
+                            <a href="javascript:deleteNode()" data-role="button" data-icon="delete" alt="Delete">Delete</a>
+                            <a href="javascript:updateNode()" data-role="button" data-icon="check" alt="Update">Update</a>
+                        </div>
                     </div>
-                    <div id="EditMenuArea">
-                        <textarea id="NodeSource" rows="7"></textarea>
-                    </div>
-                    
-                    <div id="Status"></div>
-                    <div id="EditButtons">
-                        <a href="" data-role="button" data-icon="delete" alt="Delete"></a>
-                        <a href="javascript:updateNode()" data-role="button" data-icon="check" alt="Update"></a>
+                    <div id="viewArea">
                     </div>
                 </div>
             </div>

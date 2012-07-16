@@ -42,9 +42,7 @@ useTemplate('/index.html', 'index.html', function(data, req, res) {
     res.send( ejs.render(data, { }));
 });
 
-useTemplate('/agent/:agent', 'agent.html', function(data, req, res) {
-    var agentID = req.params.agent;
-  
+function sendAgentPage(data, res, agentID, onStartCode) {
     db.collection('agents', function(err, c) {
         c.findOne({ '_id': agentID}, function(err, agent) {
             var a = agent;
@@ -53,14 +51,34 @@ useTemplate('/agent/:agent', 'agent.html', function(data, req, res) {
                 c.save( {'_id': agentID, 'agent': a }, { }, function(err, record){ });
             }
             res.send( ejs.render(data, {
-                agent: [
-                    agentID
-                ]
+                agent: a,
+                onStart: onStartCode                
             }));
         });
-    });
+    });    
     
+}
+useTemplate('/agent/:agent', 'agent.html', function(data, req, res) {
+    var agentID = req.params.agent;  
+    sendAgentPage(data, res, agentID, 'editNode(null);');
 });
+
+server.get('/agent/:agent/nodes', function(req,res) {
+    var agentID = req.params.agent;
+    
+    db.collection('agents', function(err, c) {
+        c.findOne( { '_id': agentID }, function(err2, result) {        
+            res.json(result.agent.nodes);
+        });
+    });        
+});
+
+useTemplate('/agent/:agent/:node', 'agent.html', function(data, req, res) {
+    var agentID = req.params.agent;
+    var nodeID = req.params.node;
+    sendAgentPage(data, res, agentID, 'editNode(\'' + nodeID + '\');');
+});
+
 
 function randomUUID() {
     var S4 = function() {
@@ -73,6 +91,7 @@ function updateNode(agentID, nodeID, node) {
     db.collection('agents', function(err, c) {
         c.update({ '_id': agentID }, {$addToSet: { 'agent.nodes': nodeID }});
         db.collection('nodes', function(err, c) {
+            node.author = agentID;
             c.save( {'_id': nodeID, 'node': node }, { }, function(err, record){ });
         });
     });
@@ -84,18 +103,25 @@ function newAgent() {
     return { nodes: [] };
 }
 
-function newNode(agentID, node) {
-    var nodeID = randomUUID();
-    updateNode(agentID, nodeID, node);
-    return nodeID;
+
+server.post('/agent/:agent/updatenode', function(req,res) {
+    var agentID = req.params.agent;
+    if (req.body.node._id == undefined) {
+        req.body.node._id = randomUUID();
+    }
+    updateNode(agentID, req.body.node._id, req.body.node);
+    res.json(req.body.node._id);
+});
+
+function withNode(nodeID, f) {
+   db.collection('nodes', function(err, c) {
+        c.findOne( { '_id': nodeID }, function(err, result) {
+            if (err==null)
+                f(result.node);
+        });
+   });        
 }
 
-
-server.post('/agent/:agent/newnode', function(req,res) {
-    var agentID = req.params.agent;
-    var n = newNode(agentID, req.body.node);
-    res.json(n);
-});
 server.get('/agent/:agent/json', function(req,res) {
     var agentID = req.params.agent;
     
@@ -105,16 +131,42 @@ server.get('/agent/:agent/json', function(req,res) {
         });
     });        
 });
-
-server.get('/agent/:agent/nodes', function(req,res) {
-    var agentID = req.params.agent;
+server.get('/node/:node/json', function(req,res) {
+    var nodeID = req.params.node;
     
-    db.collection('agents', function(err, c) {
-        c.findOne( { '_id': agentID }, function(err2, result) {        
-            res.json(result.agent.nodes);
+    db.collection('nodes', function(err, c) {
+        c.findOne( { '_id': nodeID }, function(err, result) {
+            if (result!=null) {
+                result._id = nodeID;
+                res.json(result.node);
+            }
         });
     });        
 });
+server.get('/node/:node/remove', function(req,res) {
+    var nodeID = req.params.node;
+    
+    db.collection('nodes', function(err, c) {
+        c.remove( { '_id': nodeID }, function(err, result) {
+            res.json(result);
+        });
+    });        
+});
+
+//server.post('/node/:node/nodesummary', function(req,res) {
+//    var nodeIDs = req.body.nodes;
+//    
+//    for (var i = 0; i < nodeIDs.length; i++) {
+//        var nodeID = nodeIDs[i];
+//        var node = getNode(nodeID);
+//        
+//    }
+//    db.collection('nodes', function(err, c) {
+//        c.findOne( { '_id': nodeID }, function(err, result) {
+//            res.json(result.node);
+//        });
+//    });        
+//});
 
 server.get('/agents', function(req,res) {
     db.collection('agents', function(err, c) {

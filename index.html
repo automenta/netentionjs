@@ -13,15 +13,13 @@ and open the template in the editor.
     <script>
         $(document).ready(function(){
             $.getJSON('/agents', function(data) {
-                $.each(data, function(i) {
-                    userID = i;
-                    $('#userList').append('<li><a href="/agent/' + userID + '">' + userID + "</a></i>");
-                })
+                for (var i = 0; i < data.length; i++)
+                    $('#agentList').append('<li><a href="/agent/' + data[i] + '">' + data[i] + "</a></i>");                    
             });
         });
     </script>
     <body>
-        <b>List of Users</b>
-        <ul id="userList"></ul>
+        <b>Agents</b>
+        <ul id="agentList"></ul>
     </body>
 </html>

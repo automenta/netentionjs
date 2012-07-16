@@ -1,16 +1,25 @@
-var nStore = require('nstore');
-nStore = nStore.extend(require('nstore/query')());
-
 var express = require('express');
 var ejs = require('ejs');
 var fs = require('fs');
 
-var agents = nStore.new('data/users.db', function () {
-    // It's loaded now
-    });
-var nodes = nStore.new('data/nodes.db', function () {
-    // It's loaded now
-    });
+
+var mongo = require('mongodb'),
+  Server = mongo.Server,
+  Db = mongo.Db;
+
+var agents, nodes;
+var mongoServer = new Server('localhost', 27017, {auto_reconnect: true});
+var db = new Db('netention', mongoServer);
+db.open(function(err, db) {
+  if(!err) {
+     console.log("DB connected");
+     db.createCollection('agents', function(err, collection) {});
+     db.createCollection('nodes', function(err, collection) {});     
+  }
+  else {
+     console.log("DB: " + err);
+  }
+});
 
 var server = express.createServer();
 server.use(express.bodyParser());
@@ -19,7 +28,7 @@ server.use(express.bodyParser());
 function useTemplate(path, file, f) {
     server.get(path, function(req, res){
         fs.readFile(file, 'ascii', function(err, data){
-            if(err) {
+            if(err) {                
                 console.error(err);
                 next();
             }
@@ -30,38 +39,27 @@ function useTemplate(path, file, f) {
 }
 
 useTemplate('/index.html', 'index.html', function(data, req, res) {
-    res.send( ejs.render(data, {
-        }));
+    res.send( ejs.render(data, { }));
 });
 
 useTemplate('/agent/:agent', 'agent.html', function(data, req, res) {
     var agentID = req.params.agent;
   
-    agents.get(agentID, function (err, doc, key) {
-        
-        var a = doc;
-        
-        if (err) { 
-            var newUser = { };
-            agents.save(agentID, {
-                nodes: []
-            }, function(err) { 
-                if (err) {
-                    throw err;
-                }
-            });
-            a = newUser;
-            
-        }
-
-        res.send( ejs.render(data, {
-            agent: [
-            agentID
-            ]
-        }));
-
+    db.collection('agents', function(err, c) {
+        c.findOne({ '_id': agentID}, function(err, agent) {
+            var a = agent;
+            if (agent == null) {
+                a = newAgent();
+                c.save( {'_id': agentID, 'agent': a }, { }, function(err, record){ });
+            }
+            res.send( ejs.render(data, {
+                agent: [
+                    agentID
+                ]
+            }));
+        });
     });
-
+    
 });
 
 function randomUUID() {
@@ -71,41 +69,24 @@ function randomUUID() {
     return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
 }
 
-function updateNode(agentID, nodeID, f) {
+function updateNode(agentID, nodeID, node) {
+    db.collection('agents', function(err, c) {
+        c.update({ '_id': agentID }, {$addToSet: { 'agent.nodes': nodeID }});
+        db.collection('nodes', function(err, c) {
+            c.save( {'_id': nodeID, 'node': node }, { }, function(err, record){ });
+        });
+    });
     
-    agents.get(agentID, function (err, agent, key) {
-
-        if (err != null)
-            return;
-        
-        if (agent == undefined)
-            return;
-        
-        var node = f(agent);
-        
-        console.log('updating: ' + agentID + '/' + nodeID);
-        
-        agents.save(agentID, agent, function(err) { 
-            if (err) {
-                throw err;
-            }
-        });
-        nodes.save(nodeID, node, function(err) {
-            if (err) {
-                throw err;
-            }            
-        });
-
-    });    
     return nodeID;
+}
+
+function newAgent() {
+    return { nodes: [] };
 }
 
 function newNode(agentID, node) {
     var nodeID = randomUUID();
-    updateNode(agentID, nodeID, function(agent) {
-        agent.nodes.push(nodeID);
-        return node;        
-    });
+    updateNode(agentID, nodeID, node);
     return nodeID;
 }
 
@@ -115,19 +96,35 @@ server.post('/agent/:agent/newnode', function(req,res) {
     var n = newNode(agentID, req.body.node);
     res.json(n);
 });
+server.get('/agent/:agent/json', function(req,res) {
+    var agentID = req.params.agent;
+    
+    db.collection('agents', function(err, c) {
+        c.findOne( { '_id': agentID }, function(err, result) {
+            res.json(result.agent);
+        });
+    });        
+});
+
 server.get('/agent/:agent/nodes', function(req,res) {
     var agentID = req.params.agent;
-  
-    agents.get(agentID, function (err, doc, key) {
-        res.json( doc.nodes );
-    });
     
+    db.collection('agents', function(err, c) {
+        c.findOne( { '_id': agentID }, function(err2, result) {        
+            res.json(result.agent.nodes);
+        });
+    });        
 });
 
 server.get('/agents', function(req,res) {
-    agents.all(function (err, results) {
-        res.json(results);
-    });
+    db.collection('agents', function(err, c) {
+        c.find().toArray(function(err, results) {        
+            var keys = [];
+            for (var i = 0; i < results.length; i++)
+                keys.push(results[i]._id);
+            res.json(keys);
+        });
+    });        
 });
 
 server.get('/', function(req,res) {
@@ -137,4 +134,8 @@ server.use(express.static(__dirname + '/file', {
     maxAge: 24*60*60*365
 }));
 
-server.listen(3000);
+
+
+
+server.listen(9090);
+

@@ -2,24 +2,8 @@ var express = require('express');
 var ejs = require('ejs');
 var fs = require('fs');
 
+var netention = require('./netention');
 
-var mongo = require('mongodb'),
-  Server = mongo.Server,
-  Db = mongo.Db;
-
-var agents, nodes;
-var mongoServer = new Server('localhost', 27017, {auto_reconnect: true});
-var db = new Db('netention', mongoServer);
-db.open(function(err, db) {
-  if(!err) {
-     console.log("DB connected");
-     db.createCollection('agents', function(err, collection) {});
-     db.createCollection('nodes', function(err, collection) {});     
-  }
-  else {
-     console.log("DB: " + err);
-  }
-});
 
 var server = express.createServer();
 server.use(express.bodyParser());
@@ -43,7 +27,7 @@ useTemplate('/index.html', 'index.html', function(data, req, res) {
 });
 
 function sendAgentPage(data, res, agentID, onStartCode) {
-    db.collection('agents', function(err, c) {
+    netention.db.collection('agents', function(err, c) {
         c.findOne({ '_id': agentID}, function(err, agent) {
             var a = agent;
             if (agent == null) {
@@ -66,7 +50,7 @@ useTemplate('/agent/:agent', 'agent.html', function(data, req, res) {
 server.get('/agent/:agent/nodes', function(req,res) {
     var agentID = req.params.agent;
     
-    db.collection('agents', function(err, c) {
+    netention.db.collection('agents', function(err, c) {
         c.findOne( { '_id': agentID }, function(err2, result) {        
             res.json(result.agent.nodes);
         });
@@ -79,31 +63,6 @@ useTemplate('/agent/:agent/:node', 'agent.html', function(data, req, res) {
     sendAgentPage(data, res, agentID, 'editNode(\'' + nodeID + '\');');
 });
 
-
-function randomUUID() {
-    var S4 = function() {
-        return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
-    };
-    return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
-}
-
-function updateNode(agentID, nodeID, node) {
-    db.collection('agents', function(err, c) {
-        c.update({ '_id': agentID }, {$addToSet: { 'agent.nodes': nodeID }});
-        db.collection('nodes', function(err, c) {
-            node.author = agentID;
-            c.save( {'_id': nodeID, 'node': node }, { }, function(err, record){ });
-        });
-    });
-    
-    return nodeID;
-}
-
-function newAgent() {
-    return { nodes: [] };
-}
-
-
 server.post('/agent/:agent/updatenode', function(req,res) {
     var agentID = req.params.agent;
     if (req.body.node._id == undefined) {
@@ -114,7 +73,7 @@ server.post('/agent/:agent/updatenode', function(req,res) {
 });
 
 function withNode(nodeID, f) {
-   db.collection('nodes', function(err, c) {
+   netention.db.collection('nodes', function(err, c) {
         c.findOne( { '_id': nodeID }, function(err, result) {
             if (err==null)
                 f(result.node);
@@ -125,7 +84,7 @@ function withNode(nodeID, f) {
 server.get('/agent/:agent/json', function(req,res) {
     var agentID = req.params.agent;
     
-    db.collection('agents', function(err, c) {
+    netention.db.collection('agents', function(err, c) {
         c.findOne( { '_id': agentID }, function(err, result) {
             res.json(result.agent);
         });
@@ -134,7 +93,7 @@ server.get('/agent/:agent/json', function(req,res) {
 server.get('/node/:node/json', function(req,res) {
     var nodeID = req.params.node;
     
-    db.collection('nodes', function(err, c) {
+    netention.db.collection('nodes', function(err, c) {
         c.findOne( { '_id': nodeID }, function(err, result) {
             if (result!=null) {
                 result._id = nodeID;
@@ -146,7 +105,7 @@ server.get('/node/:node/json', function(req,res) {
 server.get('/node/:node/remove', function(req,res) {
     var nodeID = req.params.node;
     
-    db.collection('nodes', function(err, c) {
+    netention.db.collection('nodes', function(err, c) {
         c.remove( { '_id': nodeID }, function(err, result) {
             res.json(result);
         });
@@ -161,7 +120,7 @@ server.get('/node/:node/remove', function(req,res) {
 //        var node = getNode(nodeID);
 //        
 //    }
-//    db.collection('nodes', function(err, c) {
+//    netention.db.collection('nodes', function(err, c) {
 //        c.findOne( { '_id': nodeID }, function(err, result) {
 //            res.json(result.node);
 //        });
@@ -169,7 +128,7 @@ server.get('/node/:node/remove', function(req,res) {
 //});
 
 server.get('/agents', function(req,res) {
-    db.collection('agents', function(err, c) {
+    netention.db.collection('agents', function(err, c) {
         c.find().toArray(function(err, results) {        
             var keys = [];
             for (var i = 0; i < results.length; i++)
@@ -186,8 +145,4 @@ server.use(express.static(__dirname + '/file', {
     maxAge: 24*60*60*365
 }));
 
-
-
-
 server.listen(9090);
-

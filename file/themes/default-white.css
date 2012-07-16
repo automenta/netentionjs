@@ -1,0 +1,17 @@
+body {
+    margin: 0%;
+    background: white;
+}
+
+#_Panel {
+    color: black;
+    background: white;
+}
+
+a {
+    color: #333;
+}
+
+.ContentHighlighted {
+    background-color: #ddd;
+}

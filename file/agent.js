@@ -1,7 +1,6 @@
 var schema, code;
 var types = {};
 var nodeID, node = { };
-var code;
 
 function getSchemaRoots() {
     var roots = { };
@@ -201,6 +200,7 @@ function updateCode(from, to, text, next) {
 }
 
 
+//deprecated
 function editNode(id) {            
     nodeID = id;
 
@@ -244,7 +244,7 @@ function editNode(id) {
     $('#EditMenu').html('<li><a href="#">[+]</a>' + loadTypeMenu(null, getSchemaRoots()) + '</li>');
 
     $('ul.sf-menu').superfish( {
-            delay:       0,                            // one second delay on mouseout 
+            delay:       500,                            // one second delay on mouseout 
             animation:   {opacity:'show',height:'show'},  // fade-in and slide-down animation 
             speed:       'fast'                          // faster animation speed                     
     });
@@ -354,9 +354,33 @@ function setList(l) {
     
 }
 
+function getContent() { return $('#_Content').html(); }
+function getContentText() { return $('#_Content').text(); }
+
 function append(h) {
     $('#_Content').append(h);
 }
+
+var sections = 0;
+function newSection() {
+    var s = $('<div id="section.' + sections + '"></div>');
+    $('#sections').append(s);
+    sections++;
+    return s;
+}
+
+function addRSSFeed() {
+    var url = getContentText();
+    var x = newSection();
+    x.append('Reading RSS: ' + url + '...<br/>');
+    $.post('/add/rss', { 'url': url }, function(responseText) {
+       for (var i = 0; i < responseText.length; i++) {
+           var r = responseText[i];
+           x.append('<li><a href="/agent/' + agentID + '/' + r + '">' + r + "</a></i>");
+       }
+    });
+}
+
 
 $(document).ready(function(){
     $.extend($.gritter.options, { 
@@ -366,17 +390,8 @@ $(document).ready(function(){
             time: 4000 // hang on the screen for...
     });        
 
-    code = CodeMirror.fromTextArea(document.getElementById('NodeSource'), {
-        value: 'Name\n',
-        mode:  "javascript",
-        autofocus: true,
-        theme: 'default',
-        smartIndent: false,
-        onCursorActivity: updateCode
-    });
 
     loadSchema(function() {
-        //loadNodes(agentID);
         onStart();
     });
     

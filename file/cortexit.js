@@ -535,7 +535,7 @@
             $('#EditMenu').html('<li>Type' + loadTypeMenu(null, getSchemaRoots()) + '</li>');
 
             $('ul.sf-menu').superfish( {
-                    delay:       0,                            // one second delay on mouseout 
+                    delay:       500,                            // one second delay on mouseout 
                     animation:   {opacity:'show',height:'show'},  // fade-in and slide-down animation 
                     speed:       'fast'                          // faster animation speed                     
             });
@@ -552,10 +552,14 @@
         
         showNode(-1);
     }
-    
     function toggleEdit() {
-        setEditable(!widgets['Edit']);        
+        setEditable(!isEditable());                
     }
+    
+    function isEditable() {
+        return widgets['Edit'];
+    }
+    
     function toggleNeighborhood() {
         widgets['Neighborhood'] = !widgets['Neighborhood'];
         showNode(-1);
@@ -612,7 +616,11 @@ if (currentTheme == null) {
 $(document).ready(function(){
     $('#_Speech').fadeToggle();    
 
-    jQuery('ul.sf-menu').superfish();
+    jQuery('#_Top ul.sf-menu').superfish( {
+        delay:       500,                            // one second delay on mouseout 
+        animation:   {opacity:'show',height:'show'},  // fade-in and slide-down animation 
+        speed:       'fast'                          // faster animation speed                     
+    });
 
     var panel = document.getElementById("_Panel");
     var control = document.getElementById("_Control");

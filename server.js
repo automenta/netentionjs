@@ -3,7 +3,7 @@ var ejs = require('ejs');
 var fs = require('fs');
     
 var netention = require('./netention');
-
+var rss = require('./rss');
 
 var server = express.createServer(express.bodyParser()
   , express.favicon()
@@ -68,6 +68,11 @@ server.get('/agent/:agent/nodes', function(req,res) {
         });
     });        
 });
+useTemplate('/new', 'agent.html', function(data, req, res) {
+    var agentID = req.params.agent;
+    var x = { content: '' };
+    sendAgentPage(data, res, agentID, 'setNodeTo(\'' + JSON.stringify(x) + '\');');
+});
 
 useTemplate('/agent/:agent/:node', 'agent.html', function(data, req, res) {
     var agentID = req.params.agent;
@@ -92,6 +97,12 @@ function withNode(nodeID, f) {
         });
    });        
 }
+server.post('/add/rss', function(req, res) {
+    var url = req.body.url;
+    rss.addRSS(url, function (n) {
+        res.json(n);
+    });
+});
 
 server.get('/agent/:agent/json', function(req,res) {
     var agentID = req.params.agent;

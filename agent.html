@@ -17,9 +17,9 @@
         <link rel="stylesheet" media="screen" href="/superfish/css/superfish.css" /> 
         <link rel="stylesheet" media="screen" href="/superfish/css/superfish-vertical.css" /> 
 
-        <script src="/codemirror/lib/codemirror.js"></script>
-        <link rel="stylesheet" href="/codemirror/lib/codemirror.css">
-        <script src="/codemirror/mode/javascript/javascript.js"></script>
+        <!-- wysihtml5 parser rules -->
+        <script src="/xing/parser_rules/advanced.js"></script>
+        <script src="/xing/dist/wysihtml5-0.3.0.min.js"></script>
 
         <link rel="stylesheet" type="text/css" href="/gritter/css/jquery.gritter.css" />
         <script type="text/javascript" src="/gritter/js/jquery.gritter.js"></script>
@@ -49,15 +49,6 @@
                     showMetadata();
                 }
             });
-            $( "#toggleEdit" ).button().change(function(e) {
-                if ($(this).is(':checked')) {
-                    setEditable(true);        
-                }
-                else {
-                    setEditable(false);                            
-                }
-                    
-            });
         });
     </script>
 
@@ -67,22 +58,22 @@
 
             <ul class="sf-menu">
                 <li>
-                    <a href="/node/new" class="tooltip"><img width="48px" height="48px" src="/icons/simplistica/add.png" alt="New"/><span>New</span></a>
+                    <a href="/new" class="tooltip"><img width="48px" height="48px" src="/icons/simplistica/add.png" alt="New"/><span>New</span></a>
                     <ul>
-                        <li><a href="/node/new">New node...</a></li>
+                        <li><a href="/new">New node...</a></li>
                         <li>Duplicate this node...</li>
+                        <li>As Sentences...</li>
+                        <li><a href="javascript:addRSSFeed()">Add RSS Feed...</a></li>
+                        <li>Add Twitter Timeline</li>
+                        <li>Add Twitter Search</li>
+                        <li>Text, by Paragraph (not impl yet)</li>
+                        <li>Youtube Channel  (not impl yet)</li>
+                        <li><a href="/support" class="tooltip"><img width="16px" height="16px" src="/icons/webapp/Comment.png" alt="Translate"/>Translate</a></li>
                     </ul>
                 </li>
-                <li>
-                <!-- <li id="EditButton"><a href="javascript:toggleEdit();" class="tooltip"><img width="48px" height="48px" src="/icons/simplistica/page_edit.png" alt="Edit"/><span>Edit</span></a> -->
-                    <input type="checkbox" id="toggleEdit" /><label for="toggleEdit"><img width="32px" height="32px" src="/icons/simplistica/page_edit.png" alt="Edit"/></label>
-                    <ul>
-                        <li><a href="/support" class="tooltip"><img width="48px" height="48px" src="/icons/webapp/Comment.png" alt="Translate"/><span>Translate</span></a>
-                    </ul>
+                <li id="EditButton"><a href="javascript:toggleEdit();" class="tooltip"><img width="48px" height="48px" src="/icons/simplistica/page_edit.png" alt="Edit"/><span>Edit</span></a>
                 </li>
-                <li id="NeighborhoodButton">
-                    <input type="checkbox" id="toggleMetadata" /><label for="toggleMetadata"><img width="32px" height="32px" src="/icons/webapp/Info.png" alt="Metadata"/></label>
-                    <!--<a href="javascript:showMetadata();" class="tooltip"><img width="48px" height="48px" src="/icons/webapp/Info.png" alt="Metadata"/><span>Neighborhood</span></a>-->
+                <li id="NeighborhoodButton"><a href="javascript:showMetadata();" class="tooltip"><img width="48px" height="48px" src="/icons/webapp/Info.png" alt="Metadata"/><span>Neighborhood</span></a>
                     <ul>
                         <li><a href="javascript:graphIt();" class="tooltip"><img width="48px" height="48px" src="/icons/webapp/LineChart.png" alt="Share"/><span>Graph</span></a></li>
                     </ul>
@@ -176,6 +167,7 @@
                     </div>
                     
                     <script>
+                        //deprecated
                         function apply() {
                             var t = $('#_Content').text();
 
@@ -191,49 +183,11 @@
 
                         }
                     </script>
-                    <div id="editfunctions">
-                        <div>
-                            <select id="loadmode">
-                                <option value="text">Text (as-is)</option>
-                                <option value="text_sentence">Text, by Sentence</option>
-                                <option value="rss">RSS Feed</option>
-                                <option value="twitter_timeline">Twitter Timeline</option>        
-                                <option value="twitter_search">Twitter Search</option>        
-                                <option value="text_paragraph">Text, by Paragraph (not impl yet)</option>
-                                <option value="youtube">Youtube Channel  (not impl yet)</option>        
-                            </select>
-                        </div>
-
-                        <div>
-                            <button type="button" onclick="apply();">Load</button>
-                        </div>
-
-                        <div id="output">
-                        </div>
-
-                    </div>
                 </section>            
 
             </div>
 
-            <div id="netentionEdit">
-
-                <div id="contentArea">
-
-                    <div id="editArea">
-                        <div id="EditMenuArea">
-                            <textarea id="NodeSource" rows="7"></textarea>
-                        </div>
-
-                    </div>
-                    <div id="viewArea">
-                    </div>
-                </div>
-            </div>
-
-
-            <section id="Neighborhood">
-            </section>            
+            <div id="sections"></div>
 
         </div>
 

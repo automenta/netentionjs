@@ -218,6 +218,7 @@ a.tooltipAbove:hover span{display:inline; position:absolute;  color:white;} */
         color: #fff;
 }
 
+
 .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
     background-color: rgba(128,128,128,0.5);
 }

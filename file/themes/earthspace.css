@@ -17,6 +17,7 @@
     color: #E2A848;
     background-color: rgba(0,0,0,0.5);
     font-family: 'Aldrich', sans-serif;    
+    margin-top: 4em;
 }
 
 #_Panel a {
@@ -40,16 +41,13 @@ Status {
 
 #_Top {
     position: fixed;
-    bottom:0;
-    top: auto;
+    top:0;
     left: 10%;
     right:0;
     width: 80%;
     
-    text-align:center;
     background-color: rgba(128,128,128,0.5);
     
-    overflow: auto;
 }
 #_Top ul {
     margin-bottom: 0em;

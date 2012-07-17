@@ -140,20 +140,21 @@ function addProperty(tt) {
 
         var newLine = s + ': ';
 
-        var line = code.getLine(code.lineCount()-1);
-        var prefix;
-        if (line.length > 0)
-            prefix = '\n';
-        else
-            prefix = '';
+//        var line = code.getLine(code.lineCount()-1);
+//        var prefix;
+//        if (line.length > 0)
+//            prefix = '\n';
+//        else
+//            prefix = '';
+//
+//        var tl = code.lineCount()-1;
+//
+//        code.setLine(tl, code.getLine(tl) + prefix + newLine);
+//        code.refresh();
+//        code.focus();
 
-        var tl = code.lineCount()-1;
-
-        code.setLine(tl, code.getLine(tl) + prefix + newLine);
-        code.refresh();
-        code.focus();
-
-        source.focus();                
+//        source.focus();       
+          append('<br/>\n' + newLine);
     }
     else {
         console.log('can not add property: ' + tt);

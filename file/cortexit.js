@@ -535,7 +535,7 @@
             $('#EditMenu').html('<li>Type' + loadTypeMenu(null, getSchemaRoots()) + '</li>');
 
             $('ul.sf-menu').superfish( {
-                    delay:       500,                            // one second delay on mouseout 
+                    delay:       100,                            // one second delay on mouseout 
                     animation:   {opacity:'show',height:'show'},  // fade-in and slide-down animation 
                     speed:       'fast'                          // faster animation speed                     
             });
@@ -617,7 +617,7 @@ $(document).ready(function(){
     $('#_Speech').fadeToggle();    
 
     jQuery('#_Top ul.sf-menu').superfish( {
-        delay:       500,                            // one second delay on mouseout 
+        delay:       100,                            // one second delay on mouseout 
         animation:   {opacity:'show',height:'show'},  // fade-in and slide-down animation 
         speed:       'fast'                          // faster animation speed                     
     });

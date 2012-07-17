@@ -1,7 +1,3 @@
-var FeedParser = require('feedparser')
-  , parser = new FeedParser()
-  , request = require('request')
-
 var mongo = require('mongodb'),
   Server = mongo.Server,
   Db = mongo.Db;
@@ -10,7 +6,6 @@ var agents, nodes;
 var mongoServer = new Server('localhost', 27017, {auto_reconnect: true});
 var db = new Db('netention', mongoServer);
 
-exports.db = db;
 
 db.open(function(err, db) {
   if(!err) {
@@ -42,9 +37,25 @@ function updateNode(agentID, nodeID, node) {
     
     return nodeID;
 }
+function getAgent(agentID, f) {
+    db.collection('agents', function(err, c) {
+        c.findOne({ '_id': agentID}, function(err, agent) {
+            var a = agent;
+            if (agent == null) {
+                a = newAgent();
+                c.save( {'_id': agentID, 'agent': a }, { }, function(err, record){ });
+            }
+            f(a);
+        });
+    });        
+}
 
 function newAgent() {
     return { nodes: [] };
 }
 
 
+exports.db = db;
+exports.updateNode = updateNode;
+exports.getAgent = getAgent;
+exports.randomUUID = randomUUID;

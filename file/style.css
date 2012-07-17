@@ -1,6 +1,6 @@
 body {
     font-family: Arial;
-    font-size: 18px;
+    margin: 1em;
 }
 
 
@@ -8,9 +8,6 @@ root {
     display: block;
 }
 
-body {
-    margin: 0%;
-}
 
 .smallLabel {
     font-size: 16px;
@@ -20,14 +17,11 @@ body {
     text-align:left;
     font-family:Arial,Sans;
     color: white;
-    background-color: black;
     width:100%;
-    height: 88%;
-    overflow: auto;
 }
 #_Content {
-    margin: 5px;
     opacity: 0;
+    clear:both;
     -webkit-transition: opacity 0.5s ease-in-out; //for chrome, safari
     -moz-transition: opacity 0.5s ease-in-out; //for mozilla firefox
     -o-transition: opacity 0.5s ease-in-out; //for opera
@@ -149,10 +143,10 @@ a, a.visited {
     margin-right: 0.3em;
 }
 
-.sf-menu a  {
+#_Top .sf-menu a  {
     padding: 0;
 }
-.sf-menu a.sf-with-ul {
+#_Top .sf-menu a.sf-with-ul {
     padding-right: 0;
 }
 .MenuButtonHighlighted {
@@ -182,9 +176,8 @@ a.tooltipAbove:hover span{display:inline; position:absolute;  color:white;} */
 #EditMenuBar {
     float: left; 
     width: 100%;
-    border-top: 1px solid gray;
-    border-left: 1px solid gray;
-    border-right: 1px solid gray;
+    margin-top: 1em;
+    clear:both;
 }
 #EditMenuArea {
     float: left; 
@@ -203,11 +196,30 @@ a.tooltipAbove:hover span{display:inline; position:absolute;  color:white;} */
 .sf-menu li { 
     padding: 0.5em;
 }
-#EditMenuBar {
-    background-color: #eee;            
+.sf-menu li li {
+    background-color: rgba(25,25,25,0.95);
+}
+.sf-menu li li li {
+    background-color: rgba(24,24,24,0.95);
+}
+.sf-menu li li li li {
+    background-color: rgba(23,23,23,0.95);
+}
+.sf-menu a, .sf-menu a:visited {
+    color: #ddd;
+}
+.sf-menu li:hover, .sf-menu li.sfHover,
+.sf-menu a:focus, .sf-menu a:hover, .sf-menu a:active {
+	background-color:		#454545;
+	outline:		0;
+        color: #fff;
+}
+
+#EditMenuBar, #EditBottom {
+    background-color: rgba(255, 255, 255, 0.2);
 }
 #EditMenuBar li { 
-    padding-bottom: 1.0em;
+    padding-bottom: 1em;
 }
 
 .firstLine {
@@ -235,9 +247,7 @@ a.tooltipAbove:hover span{display:inline; position:absolute;  color:white;} */
 #listArea ul {
     width: 100%;
 }
-.ui-listview-filter .ui-input-search  {
-    margin-bottom: 1em;
-}
+
 .ui-body-c, .ui-overlay-c {
     text-shadow: none;
 }

@@ -1,13 +1,21 @@
 var express = require('express');
 var ejs = require('ejs');
 var fs = require('fs');
-
+    
 var netention = require('./netention');
 
 
-var server = express.createServer();
+var server = express.createServer(express.bodyParser()
+  , express.favicon()
+  , express.cookieParser()
+  , express.session({ secret: '3423fewf'})
+  );
+  
 server.use(express.bodyParser());
-
+server.use(express.static(__dirname + '/file', {
+    maxAge: 24*60*60*365
+}));
+  
 //f = function(fileData, req, res) { }
 function useTemplate(path, file, f) {
     server.get(path, function(req, res){
@@ -26,22 +34,17 @@ useTemplate('/index.html', 'index.html', function(data, req, res) {
     res.send( ejs.render(data, { }));
 });
 
+
+
 function sendAgentPage(data, res, agentID, onStartCode) {
-    netention.db.collection('agents', function(err, c) {
-        c.findOne({ '_id': agentID}, function(err, agent) {
-            var a = agent;
-            if (agent == null) {
-                a = newAgent();
-                c.save( {'_id': agentID, 'agent': a }, { }, function(err, record){ });
-            }
+    netention.getAgent(agentID, function (a) {
             res.send( ejs.render(data, {
                 agent: a,
                 onStart: onStartCode                
-            }));
-        });
+            }));        
     });    
-    
 }
+
 useTemplate('/agent/:agent', 'agent.html', function(data, req, res) {
     var agentID = req.params.agent;  
     sendAgentPage(data, res, agentID, 'editNode(null);');
@@ -96,7 +99,7 @@ server.get('/node/:node/json', function(req,res) {
     netention.db.collection('nodes', function(err, c) {
         c.findOne( { '_id': nodeID }, function(err, result) {
             if (result!=null) {
-                result._id = nodeID;
+                result.node._id = nodeID;
                 res.json(result.node);
             }
         });
@@ -141,8 +144,8 @@ server.get('/agents', function(req,res) {
 server.get('/', function(req,res) {
     res.redirect('/index.html');
 });
-server.use(express.static(__dirname + '/file', {
-    maxAge: 24*60*60*365
-}));
 
+
+
+ 
 server.listen(9090);

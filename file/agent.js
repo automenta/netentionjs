@@ -109,7 +109,7 @@ function loadPropertiesMenu(type, history) {
                 if (!isSupertype(type, range)) {
                     if (schema.types[range].properties.length > 0) {
                         history.push(v);
-                        t += '<li>' + label + loadPropertiesMenu(range, history) + "</li>";
+                        t += '<li><a href="#">' + label + '</a>' + loadPropertiesMenu(range, history) + "</li>";
                         history.pop();
                     }
                 }
@@ -168,7 +168,7 @@ function addType(t, forClass, forProp) {
         if (forProp!=null) {
             p = forProp + '/';
         }
-        $('#EditMenu').append('<li><a href="#">' + p + v.label + '</a>' + loadPropertiesMenu(t) + '</li>');
+        $('#EditMenu').append('<li>' + p + v.label + '' + loadPropertiesMenu(t) + '</li>');
         $('ul.sf-menu').superfish();
     }
     types[t] = true;
@@ -177,7 +177,7 @@ function addType(t, forClass, forProp) {
 function updateCode(from, to, text, next) {
     var currentLine = code.getCursor().line;     
     var line = code.getLine(currentLine);
-    var status = $('#Status');
+    var status = $('#EditStatus');
     if (currentLine == 0) {
         status.html("Enter a name for this object on the first line.");                
     }
@@ -313,17 +313,23 @@ function updateNode() {
     });
 }        
 
-function loadNodes(target) {
-    $.getJSON('/agent/' + agentID + '/nodes', function(data) {
-        $(target).html('');
+function loadNodes(a) {
+    var nid = newWindow(a + ' Nodes', '');
+
+    $.getJSON('/agent/' + a + '/nodes', function(data) {
+        
         for (var i = 0; i < data.length; i++) {
             var nodeID = data[i];
             $.getJSON('/node/' + nodeID + '/json', function(data) {
-                var title = data.content.split('\n')[0];
-                $(target).append('<li><a href="/agent/' + agentID + '/' + data._id + '">' + title + "</a></i>");
+                var title = data.content;
+                if (title == undefined) title = 'Untitled';
+                if (title.indexOf('\n')!=-1)
+                    title = title.split('\n')[0];
+                $('#' + nid).append('<li><a href="/agent/' + agentID + '/' + data._id + '">' + title + "</a></i>");
             });
         }
     });
+    
 
 }
 
@@ -345,7 +351,7 @@ $(document).ready(function(){
     });
 
     loadSchema(function() {
-        //loadNodes('#listAreaList');
+        //loadNodes(agentID);
         onStart();
     });
     

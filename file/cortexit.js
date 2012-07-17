@@ -183,7 +183,6 @@
         var content = document.getElementById("_Content");
         content.innerHTML = renderMainContent(currentNode);
 
-        $('#_Content').attr('contentEditable', widgets['Edit']);
 
         if (currentNode!=null) {
             
@@ -241,15 +240,6 @@
                 status.innerHTML = ((prevID!=null) ? "<--" : "") + " | " + ((nextID!=null) ? "-->" : "");
             else
                 status.innerHTML = '';
-        }
-        
-        if (widgets["Edit"]) {
-            $('#Edit').show();
-            highlightButton('EditButton', true);
-        }
-        else {
-            $('#Edit').hide();                
-            highlightButton('EditButton', false);
         }
 
         
@@ -440,8 +430,9 @@
 //        $('#' + newID).fadeIn();
         w.dialog({title: theTitle, width: '60%', height: 450} );
         w.fadeIn();
-
+        return newID;
     }
+    
     function newWindowIFrame(theTitle, url) {
         newWindow(theTitle, '<iframe src=\"' + url + '\" width="98%" height="98%"></iframe>');
     }
@@ -526,10 +517,33 @@
         widgets['Edit'] = e;
         
         if (!e) {
-            if (contentBeforeEdit != $('#_Content').html())
+           if (contentBeforeEdit != $('#_Content').html())
                 ensureContentSaved();
+            
+           $('#_Content').attr('contentEditable', false);
+           $('#Edit').hide();                
+           highlightButton('EditButton', false);
+
+           $('#EditMenuBar').fadeOut();
+           $('#EditBottom').fadeOut();
         }
         else {
+            $('#EditMenu').html('<li>Type' + loadTypeMenu(null, getSchemaRoots()) + '</li>');
+
+            $('ul.sf-menu').superfish( {
+                    delay:       0,                            // one second delay on mouseout 
+                    animation:   {opacity:'show',height:'show'},  // fade-in and slide-down animation 
+                    speed:       'fast'                          // faster animation speed                     
+            });
+
+            $('#_Content').attr('contentEditable', true);
+
+            $('#Edit').show();
+            highlightButton('EditButton', true);
+
+            $('#EditMenuBar').fadeIn();
+            $('#EditBottom').fadeIn();
+            
         }
         contentBeforeEdit = $('#_Content').html();
         
@@ -542,6 +556,13 @@
     function toggleNeighborhood() {
         widgets['Neighborhood'] = !widgets['Neighborhood'];
         showNode(0);
+    }
+    function showMetadata() {
+        var x = '';
+        for(var key in currentNode) {
+            x += key + ': ' + currentNode[key] + '<br/>';
+        }
+        newWindow('Metadata', x);        
     }
 
 

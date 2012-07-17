@@ -12,12 +12,10 @@
 */
 @import url("default-black.css");
 
-#_Panel {
-    color: #18B218;
-    background-color: black;
+#_Content {
+    color: #58B2f8;
 }
 
-
-Status {
-    color: white;
+body {
+    background-image: url('/themes/image/holodeck1.jpg');
 }

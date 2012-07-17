@@ -109,8 +109,12 @@ a, a.visited {
 #_Top {
     top:0;
     left:1%;
-}
 
+}
+#_Top ul {
+    margin-bottom: 1em;
+
+}
 
 
 .menu{
@@ -176,7 +180,6 @@ a.tooltipAbove:hover span{display:inline; position:absolute;  color:white;} */
 #EditMenuBar {
     float: left; 
     width: 100%;
-    margin-top: 1em;
     clear:both;
 }
 #EditMenuArea {
@@ -213,6 +216,10 @@ a.tooltipAbove:hover span{display:inline; position:absolute;  color:white;} */
 	background-color:		#454545;
 	outline:		0;
         color: #fff;
+}
+
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+    background-color: rgba(128,128,128,0.5);
 }
 
 #EditMenuBar, #EditBottom {

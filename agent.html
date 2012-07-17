@@ -27,7 +27,8 @@
 
         <link rel="stylesheet" type="text/css" href="/style.css" />
 
-        <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css" type="text/css" media="all" />
+        <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-darkness/jquery-ui.css" type="text/css" media="all" />
+
         <script type="text/javascript" src="/totalstorage/jquery.total-storage.min.js"></script>
         
         <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js" type="text/javascript"></script>
@@ -42,7 +43,7 @@
     </head>
     <script>
         $(document).ready(function(){
-            onStart = function() { <%= onStart %> };
+            onStart = function() { <%- onStart %> };
             $( "#toggleMetadata" ).button().change(function(e) {
                 if ($(this).is(':checked')) {
                     showMetadata();
@@ -98,8 +99,8 @@
                 <li><a href="javascript:imageIt();" class="tooltip"><img width="48px" height="48px" src="/icons/webapp/Picture.png" alt="Images"/><span>Images</span></a></li>
                 <li><a href="#" class="tooltip"><img width="48px" height="48px" src="/icons/simplistica/monitor.png" alt="Theme"/><span>Theme</span></a>
                     <ul>
-                        <li><a href="javascript:setTheme('default-black')">White on Black</a></li>
                         <li><a href="javascript:setTheme('default-white')">Black on White</a></li>
+                        <li><a href="javascript:setTheme('default-black')">White on Black</a></li>
                         <li><a href="javascript:setTheme('terminal-green')">Terminal Green</a></li>
                         <li><a href="javascript:setTheme('earthspace')">Earth Space</a></li>
                         <li><a href="javascript:setTheme('concrete')">Concrete</a></li>
@@ -164,10 +165,9 @@
                 </ul>            
             </div>
             <div id="_Content" contentEditable="false" onMouseOver='onContentMouseOver(this);' onMouseOut='onContentMouseOut(this);'>
-                <div id="Loading"><center>Loading...</center></div>
             </div>
             <div id="EditBottom" style="display:none">
-                <section id="Edit" style="display:none">
+                <section id="Edit">
                     <div id="EditStatus"></div>
 
                     <div id="EditButtons">

@@ -13,9 +13,18 @@
 @import url("default-black.css");
 
 #_Content {
-    color: #58B2f8;
+    color: #adf298;
+    background-color: rgba(0,0,0,0.6);
+    padding: 0.5em;
+    
+    text-align:justify;
+}
+#_Content a, #_Content a:visited {
+    color: #fdB2c8;    
 }
 
 body {
-    background-image: url('/themes/image/holodeck1.jpg');
+    background: url('/themes/image/holodeck1.jpg')  no-repeat center center fixed;
+    background-size: cover;    
+    height: 100%;
 }

@@ -101,10 +101,10 @@
         }
         else {
             title = '';
-            content = "I'm thinking about...";        
+            content = "";
         }
         
-        var line = '<div id="mainContent">' + title + content + '</div>';
+        var line = title + content;
         return line;
     }
     function renderNeighborhood(node) {
@@ -178,10 +178,14 @@
         
         disableVozmeSpeech();
 
-        currentNode = nodes[f];
+        if (f > -1) {
+            currentNode = nodes[f];
+            var content = document.getElementById("_Content");
+            content.innerHTML = renderMainContent(currentNode);
+        }
+        else {
+        }
         
-        var content = document.getElementById("_Content");
-        content.innerHTML = renderMainContent(currentNode);
 
 
         if (currentNode!=null) {
@@ -304,8 +308,8 @@
     }
     
     function updateFonts() {
-        //updateFont( document.getElementById("_Content") );
-        updateFont( document.getElementById("mainContent") );       
+        updateFont( document.getElementById("_Content") );
+        //updateFont( document.getElementById("mainContent") );       
         updateFont( document.getElementById("_GoInput") );  //TODO this is a hack, use JQuery selector for all input-box classes. see go.html
     }
 
@@ -502,15 +506,15 @@
 
 
     function saveContent() {
-        currentNode.prop['content'] = $('#_Content').html();
+        currentNode.content = $('#_Content').html();
     }
     
     function ensureContentSaved() {
         if (confirm("Save edits?")) { 
             saveContent();
         }
-
-    }
+ 
+   }
     
     var contentBeforeEdit = '';
     function setEditable(e) {
@@ -521,7 +525,7 @@
                 ensureContentSaved();
             
            $('#_Content').attr('contentEditable', false);
-           $('#Edit').hide();                
+           
            highlightButton('EditButton', false);
 
            $('#EditMenuBar').fadeOut();
@@ -538,7 +542,6 @@
 
             $('#_Content').attr('contentEditable', true);
 
-            $('#Edit').show();
             highlightButton('EditButton', true);
 
             $('#EditMenuBar').fadeIn();
@@ -547,7 +550,7 @@
         }
         contentBeforeEdit = $('#_Content').html();
         
-        showNode(0);
+        showNode(-1);
     }
     
     function toggleEdit() {
@@ -555,7 +558,7 @@
     }
     function toggleNeighborhood() {
         widgets['Neighborhood'] = !widgets['Neighborhood'];
-        showNode(0);
+        showNode(-1);
     }
     function showMetadata() {
         var x = '';

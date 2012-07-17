@@ -1,5 +1,4 @@
 body {
-    margin: 0%;
     background: white;
 }
 
@@ -8,10 +7,7 @@ body {
     background: white;
 }
 
-a {
+#_Panel a, #_Panel a:visited {
     color: #333;
 }
 
-.ContentHighlighted {
-    background-color: #ddd;
-}

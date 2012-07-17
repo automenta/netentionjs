@@ -14,19 +14,19 @@
 @import url(http://fonts.googleapis.com/css?family=Gochi+Hand);
 
 #_Panel {
-    color: #D282F2;
+    color: #d2a2F2;
     font-family: 'Gochi Hand', cursive;
-    background-color: transparent;
 }
 
-#_Panel a {
-    color: #9999ff;
+#_Panel a, #_Panel a:visited {
+    color: #bbbbff;
     font-family: 'Gochi Hand', cursive;
 }
 
 body {
-   background: url('/static/themes/image/concrete.jpg') no-repeat;
-   background-size: 100%;
+    background: url('/themes/image/concrete.jpg')  no-repeat center center fixed;
+    background-size: cover;    
+    height: 100%;
 }
 
 Status {

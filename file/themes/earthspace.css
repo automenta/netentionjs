@@ -11,34 +11,46 @@
    Syntax recommendation http://www.w3.org/TR/REC-CSS2/
 */
 @import url("default-black.css");
+@import url(http://fonts.googleapis.com/css?family=Aldrich);
 
 #_Panel {
     color: #E2A848;
-    font-family: monospace;
-    background-color: black;
-    border: 5px solid green;
+    background-color: rgba(0,0,0,0.5);
+    font-family: 'Aldrich', sans-serif;    
 }
 
 #_Panel a {
     color: #D282F2;
-    font-family: monospace;
-    font-weight: bold;
+    font-family: 'Aldrich', sans-serif;    
+}
+
+#_Content {
+    padding: 0.5em;
 }
 
 body {
-   background: url('/static/themes/image/earth.jpg') no-repeat;
-   background-size: 100%;
-   background-color: transparent;
+    background: url('/themes/image/earthspace.jpg') no-repeat center center fixed;
+    background-size: cover;    
+    height: 100%;
 }
 
 Status {
     color: white;
 }
 
-
-#Status a {
-    font-family: monospace;
+#_Top {
+    position: fixed;
+    bottom:0;
+    top: auto;
+    left: 10%;
+    right:0;
+    width: 80%;
+    
+    text-align:center;
+    background-color: rgba(128,128,128,0.5);
+    
+    overflow: auto;
 }
-#_Font a {
-    font-family: monospace;
+#_Top ul {
+    margin-bottom: 0em;
 }

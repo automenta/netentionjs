@@ -253,7 +253,12 @@ function editNode(id) {
 
 }
 
-function viewNode(n) {
+function setNodeTo(x) {
+    _n(x);
+    showNode(0);
+}
+
+function setNodeById(n) {
     $.getJSON('/node/' + n + '/json', function(data) {
         _n(data);
         showNode(0);
@@ -313,6 +318,7 @@ function updateNode() {
     });
 }        
 
+//deprecated
 function loadNodes(a) {
     var nid = newWindow(a + ' Nodes', '');
 
@@ -329,8 +335,27 @@ function loadNodes(a) {
             });
         }
     });
-    
+}
 
+function setList(l) {
+     
+    showNode(-1);
+    for (var i = 0; i < l.length; i++) {
+        var nodeID = l[i];
+        $.getJSON('/node/' + nodeID + '/json', function(data) {
+            var title = data.content;
+            if (title == undefined) title = 'Untitled';
+            if (title.indexOf('\n')!=-1)
+                title = title.split('\n')[0];
+            console.log(data.content);
+            append('<li><a href="/agent/' + agentID + '/' + data._id + '">' + title + "</a></i>");
+        });
+    }
+    
+}
+
+function append(h) {
+    $('#_Content').append(h);
 }
 
 $(document).ready(function(){

@@ -47,7 +47,16 @@ function sendAgentPage(data, res, agentID, onStartCode) {
 
 useTemplate('/agent/:agent', 'agent.html', function(data, req, res) {
     var agentID = req.params.agent;  
-    sendAgentPage(data, res, agentID, 'editNode(null);');
+//    var index = { content: "INDEX" };
+//    sendAgentPage(data, res, agentID, 'setNodeTo(' + JSON.stringify(index) + ');');
+
+    netention.db.collection('agents', function(err, c) {
+        c.findOne( { '_id': agentID }, function(err2, result) {        
+            var index = JSON.stringify(result.agent.nodes);
+            sendAgentPage(data, res, agentID, 'setList(' + index + ');');
+        });
+    });        
+
 });
 
 server.get('/agent/:agent/nodes', function(req,res) {
@@ -63,7 +72,7 @@ server.get('/agent/:agent/nodes', function(req,res) {
 useTemplate('/agent/:agent/:node', 'agent.html', function(data, req, res) {
     var agentID = req.params.agent;
     var nodeID = req.params.node;
-    sendAgentPage(data, res, agentID, 'viewNode(\'' + nodeID + '\');');
+    sendAgentPage(data, res, agentID, 'setNodeById(\'' + nodeID + '\');');
 });
 
 server.post('/agent/:agent/updatenode', function(req,res) {

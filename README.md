@@ -20,7 +20,7 @@ Ubuntu install everything:
 
 Then install the npm packages:
 
-    npm install mongodb feedparser express ejs fs always
+    npm install mongodb feedparser express ejs fs always now
 
 Then run:
 

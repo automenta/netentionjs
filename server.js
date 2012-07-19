@@ -5,17 +5,42 @@ var fs = require('fs');
 var netention = require('./netention');
 var rss = require('./rss');
 
+var passport = require('passport')
+  , OpenIDStrategy = require('passport-openid').Strategy;
+
+
+passport.use(new OpenIDStrategy({
+    returnURL: 'http://24.131.65.218:9090/auth/openid/return',
+    realm: 'http://24.131.65.218:9090'
+  },
+  function(identifier, done) {
+      console.log('Authenticated: ' + identifier);
+      done(null, identifier);
+  }
+));
+
 var server = express.createServer(express.bodyParser()
   , express.favicon()
   , express.cookieParser()
-  , express.session({ secret: '3423fewf'})
+//  , express.session({ secret: '3423fewf'})
+//    passport.initialize(),
+//    passport.session()  
   );
-  
+server.use(passport.initialize());
 server.use(express.bodyParser());
 server.use(express.static(__dirname + '/file', {
     maxAge: 24*60*60*365
 }));
 
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function(id, done) {
+//  User.findOne(id, function (err, user) {
+    done(null, id);
+//  });
+});
 
 //f = function(fileData, req, res) { }
 function useTemplate(path, file, f) {
@@ -192,6 +217,7 @@ server.get('/node/:node/remove', function(req,res) {
 server.get('/', function(req,res) {
     res.redirect('/index.html');
 });
+server.get('/login', function(req,res) { res.redirect('/login.html'); });
 
 
 
@@ -204,3 +230,18 @@ var everyone = require("now").initialize(app);
 //  everyone.now.receiveMessage(this.now.name, message);
 //};
 everyone.now.forEachNode = forEachNode;
+
+
+
+// Accept the OpenID identifier and redirect the user to their OpenID
+// provider for authentication.  When complete, the provider will redirect
+// the user back to the application at
+// /auth/openid/return
+server.post('/auth/openid', passport.authenticate('openid'));
+
+// The OpenID provider has redirected the user back to the application.
+// Finish the authentication process by verifying the assertion.  If valid,
+// the user will be logged in.  Otherwise, authentication has failed.
+server.get('/auth/openid/return', 
+  passport.authenticate('openid', { successRedirect: '/',
+                                    failureRedirect: '/login' }));

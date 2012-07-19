@@ -344,15 +344,30 @@ function setList(l) {
     for (var i = 0; i < l.length; i++) {
         var nodeID = l[i];
         $.getJSON('/node/' + nodeID + '/json', function(data) {
-            var title = data.content;
-            if (title == undefined) title = 'Untitled';
+            var title = data.node.title;
+            if (title == undefined) title = data._id;
             if (title.indexOf('\n')!=-1)
                 title = title.split('\n')[0];
-            console.log(data.content);
+            console.log(title + ' ' + data.content);
             append('<li><a href="/agent/' + agentID + '/' + data._id + '">' + title + "</a></i>");
         });
     }
     
+}
+
+function setNodeList() {
+    showNode(-1);
+    
+    now.ready(function(){
+
+        now.forEachNode(function(data) {
+            var title = data.node.title;
+            if (title == undefined) title = data._id;
+            if (title.indexOf('\n')!=-1)
+                title = title.split('\n')[0];
+            append('<li><a href="/node/' + data._id + '">' + title + "</a></i>");
+        });
+    });
 }
 
 function getContent() { return $('#_Content').html(); }
@@ -377,7 +392,7 @@ function addRSSFeed() {
     $.post('/add/rss', { 'url': url }, function(responseText) {
        for (var i = 0; i < responseText.length; i++) {
            var r = responseText[i];
-           x.append('<li><a href="/agent/' + agentID + '/' + r + '">' + r + "</a></i>");
+           x.append('<li><a href="/node/' + r + '">' + r + "</a></i>");
        }
     });
 }
@@ -397,5 +412,6 @@ $(document).ready(function(){
     });
     
 });
+
 
 var onStart = function() { }

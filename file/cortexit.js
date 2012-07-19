@@ -14,7 +14,7 @@
     var widgets = { };
     
     function saveWidgets() {
-        $.totalStorage('widgets', widgets);        
+        locache.set('widgets', widgets);
     }
     
     function enableVozmeSpeech(line) {
@@ -54,8 +54,12 @@
     }
     
     function speakSpeech(f) {
-        $.getScript("/speak/speakClient.js", function(data, textStatus, jqxhr) {
-            var content = $('#_Content').text();            
+        var content = $('#_Content').text();        
+        if (content.length > 1024) {
+            alert('Content too big, this may overload the client speech engine.  Try reducing this node into smaller nodes and speaking them in sequence.');
+            return;
+        }
+        $.getScript("/speak/speakClient.js", function(data, textStatus, jqxhr) {            
             speak.play(content, {amplitude: 100, wordgap: 5, pitch: 25, speed: 200}, f );
         });
     }
@@ -181,7 +185,7 @@
         if (f > -1) {
             currentNode = nodes[f];
             var content = document.getElementById("_Content");
-            content.innerHTML = renderMainContent(currentNode);
+            content.innerHTML = renderMainContent(currentNode.node);
         }
         else {
         }
@@ -506,6 +510,9 @@
 
 
     function saveContent() {
+        if (currentNode == null)
+            currentNode = { }
+        
         currentNode.content = $('#_Content').html();
     }
     
@@ -644,7 +651,7 @@ $(document).ready(function(){
         font.onmousewheel= onFontSpin;
     }
 
-    var w = $.totalStorage('widgets');
+    var w = locache.get('widgets');
     if (w != undefined) {
         widgets = w;
     }

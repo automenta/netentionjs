@@ -33,7 +33,7 @@ function addRSS(url, f) {
           //console.log('%s - %s (%s)', article.date, article.title, article.link);
           var n = netention.updateNode(agentID, nodeID, article)
           nodes.push(n);
-        });
+        });        
         
         console.log(nodes);        
         f(nodes);

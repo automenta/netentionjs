@@ -4,10 +4,9 @@ body {
 
 #_Panel {
     color: black;
-    background: white;
 }
 
-#_Panel a, #_Panel a:visited {
+a, a:visited, #_Panel a, #_Panel a:visited {
     color: #333;
 }
 

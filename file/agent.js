@@ -275,10 +275,9 @@ function loadSchema(whenSchemaLoaded) {
 }
 
 function commitNode() {
-    code.save();
     if (nodeID!=undefined)
         node._id = nodeID;
-    node.content = code.getTextArea().value;
+    node.content = getContent();
 
     var typesList = [];
     $.each(types, function(k, v) {
@@ -299,25 +298,6 @@ function deleteNode() {
     }
 }
 
-function updateNode() {
-    var g = $.gritter.add({
-            title: 'Saving New Node',
-            text: 'Standby...'
-    });
-
-    $.post('/agent/' + agentID + '/updatenode', 
-      { 'node': commitNode() },
-      function(data) {
-        $.gritter.remove(g);
-        $.gritter.add({
-                title: 'Saved',
-                text: 'Result: ' + data
-        });
-        nodeID = data;
-        node._id = nodeID;
-        loadNodes();
-    });
-}        
 
 //deprecated
 function loadNodes(a) {
@@ -385,16 +365,51 @@ function newSection() {
     return s;
 }
 
+function getInputLine(instructions, defaultValue, retryCode) {
+    var x = getContentText().trim();
+    if (x.length == 0) {
+//        var retVal = prompt("RSS Feed", "http://");
+//        x = retVal;
+        setNodeTo( { content: defaultValue } );
+        $('#EditStatus').html( instructions + '<button onClick="' + retryCode + '">Retry</button>');
+        setEditable(true);
+        $('#_Content').focus();
+        return null;
+    }    
+    return x;
+}
+
 function addRSSFeed() {
-    var url = getContentText();
-    var x = newSection();
-    x.append('Reading RSS: ' + url + '...<br/>');
-    $.post('/add/rss', { 'url': url }, function(responseText) {
-       for (var i = 0; i < responseText.length; i++) {
-           var r = responseText[i];
-           x.append('<li><a href="/node/' + r + '">' + r + "</a></i>");
-       }
-    });
+    var url = getInputLine("Enter RSS Feed URL", "http://", 'addRSSFeed()');
+    
+    if (url!=null) {
+        var x = newSection();
+        x.append('Reading RSS: ' + url + '...<br/>');
+        $.post('/add/rss', { 'url': url }, function(responseText) {
+           for (var i = 0; i < responseText.length; i++) {
+               var r = responseText[i];
+               x.append('<li><a href="/node/' + r + '">' + r + "</a></i>");
+           }
+        });
+    }
+}
+
+function addSentencized() {
+    var urlOrText = getInputLine("Enter URL or text", "http://", 'addSentencized()');
+    if (urlOrText!=null) {
+        var x = newSection();
+        x.append('Sentencizing: ' + urlOrText + '...<br/>');
+        
+        now.ready(function(){
+            now.sentencize( urlOrText , function( items ) {
+                for (var i = 0; i < items.length; i++) {
+                    var r = items[i];
+                    x.append('<li><a href="/node/' + r + '">' + r + "</a></i>");
+                }                
+            });
+        });   
+    }
+    
 }
 
 
@@ -405,7 +420,10 @@ $(document).ready(function(){
             fade_out_speed: 2000, // how fast the notices fade out
             time: 4000 // hang on the screen for...
     });        
-
+    
+    var myNicEditor = new nicEditor({fullPanel : true});
+    myNicEditor.setPanel('_ContentBar');
+    myNicEditor.addInstance('_Content');
 
     loadSchema(function() {
         onStart();

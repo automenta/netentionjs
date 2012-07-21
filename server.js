@@ -1,7 +1,8 @@
 var express = require('express');
 var ejs = require('ejs');
 var fs = require('fs');
-    
+var apricot = require('apricot').Apricot;
+
 var netention = require('./netention');
 var rss = require('./rss');
 
@@ -19,37 +20,38 @@ passport.use(new OpenIDStrategy({
   }
 ));
 
-var server = express.createServer(express.bodyParser()
-  , express.favicon()
-  , express.cookieParser()
-//  , express.session({ secret: '3423fewf'})
-//    passport.initialize(),
-//    passport.session()  
-  );
-server.use(passport.initialize());
+var server = express.createServer();
+
 server.use(express.bodyParser());
+server.use(express.favicon());
+server.use(express.cookieParser());
+server.use(passport.initialize());
+server.use(passport.session());
 server.use(express.static(__dirname + '/file', {
     maxAge: 24*60*60*365
 }));
 
 passport.serializeUser(function(user, done) {
-  done(null, user);
+    console.log('serializing: ' + user);
+  done(null, JSON.stringify(user));
 });
 
 passport.deserializeUser(function(id, done) {
+    console.log('deserializing: ' + id);
 //  User.findOne(id, function (err, user) {
-    done(null, id);
+    done(null, JSON.parse(id));
 //  });
 });
 
 //f = function(fileData, req, res) { }
 function useTemplate(path, file, f) {
-    server.get(path, function(req, res){
+    server.get(path,  /*passport.authenticate('openid', { session: false , successFlash: 'Welcome' }),*/ function(req, res){
         fs.readFile(file, 'ascii', function(err, data){
             if(err) {                
                 console.error(err);
                 next();
             }
+            console.log('serving ' + path + ' to ' + req.user);
 
             f(data, req, res);
         });
@@ -136,6 +138,70 @@ function forEachNode(f/*(n)*/) {
     
 }
 
+function sentencize(urlOrText, f) {
+   
+   var rootNode;
+   
+   var p = function(err, doc) {
+       if (err==null) {
+           var str = doc.toHTML;
+           str=str.replace(/<br>/gi, "\n");
+           str=str.replace(/<p.*>/gi, "\n");
+           str=str.replace(/<a.*href="(.*?)".*>(.*?)<\/a>/gi, " $2 (Link->$1) ");
+           str=str.replace(/<(?:.|\s)*?>/g, "");
+                          
+           var linesPreFilter = str.split("\n");
+           var slines = [];
+           var i;
+           for (i = 0; i < linesPreFilter.length; i++) {
+               var t = linesPreFilter[i].trim();               
+               if (t.length > 0) {
+                   slines.push(t);
+               }                  
+           }    
+           
+           var lines = [];
+           for (i = 0; i < slines.length; i++) {
+                var nodeID = rootNode + '.' + i;
+                var agentID = 'sentencize';
+                var a = { content: slines[i] };
+                if (i > 0) {
+                    a.previous = rootNode + '.' + (i-1);
+                }
+                if (i < slines.length-1) {
+                    a.next = rootNode + '.' + (i+1);
+                }
+
+                var nt = netention.updateNode(agentID, nodeID, a )
+                lines.push(nt);
+               
+           }
+           
+           f(lines);
+       }
+       else {
+           console.log('ERROR: ' + rss);
+           f(err);
+       }
+   }
+   
+   if (urlOrText.indexOf('http://')==0) {
+       rootNode = urlOrText;
+       rootNode = rootNode.replace(/http:\/\//g, "");
+       rootNode = rootNode.replace(/\//g, "_");
+       //rootNode = netention.randomUUID();
+       apricot.open(urlOrText, p, true);
+   }
+   else {
+       var summaryLength = 16;
+       if (urlOrText.length < summaryLength)
+           summaryLenth = urlOrText.length;
+       rootNode = urlOrText.substring(0, summaryLength);
+       rootNode = encodeURIComponent(rootNode);
+       apricot.parse(urlOrText, p);       
+   }
+}
+
 
 server.post('/add/rss', function(req, res) {
     var url = req.body.url;
@@ -160,7 +226,7 @@ useTemplate('/node/:node', 'node.html', function(data, req, res) {
         c.findOne( { '_id': nodeID }, function(err, result) {
             if (result!=null) {
                 result.node._id = nodeID;
-                sendAgentPage(data, res, getAgentID(), 'setNodeTo(' + JSON.stringify(result) + ');');
+                sendAgentPage(data, res, getAgentID(), 'setNodeTo(' + JSON.stringify(result.node) + ');');
             }
         });
     });        
@@ -230,6 +296,7 @@ var everyone = require("now").initialize(app);
 //  everyone.now.receiveMessage(this.now.name, message);
 //};
 everyone.now.forEachNode = forEachNode;
+everyone.now.sentencize = sentencize;
 
 
 

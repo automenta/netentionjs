@@ -20,7 +20,7 @@ Ubuntu install everything:
 
 Then install the npm packages:
 
-    npm install mongodb feedparser express ejs fs always now
+    npm install mongodb feedparser express ejs fs apricot always now
 
 Then run:
 

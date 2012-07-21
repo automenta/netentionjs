@@ -185,14 +185,28 @@
         if (f > -1) {
             currentNode = nodes[f];
             var content = document.getElementById("_Content");
-            content.innerHTML = renderMainContent(currentNode.node);
+            content.innerHTML = renderMainContent(currentNode);
+            
+
         }
         else {
         }
         
+        if (!isEditable())
+            contentBeforeEdit = undefined;
+        
+        setEditable(isEditable());
 
 
         if (currentNode!=null) {
+            for (var ii in currentNode) {
+                if (ii == 'next') {
+                    nextID = currentNode.next;
+                }
+                else if (ii == 'previous') {
+                    prevID = currentNode.previous;
+                }
+            }
             
             if (widgets['Neighborhood']) { 
                 $("#Neighborhood").html( renderNeighborhood(currentNode) );
@@ -221,28 +235,29 @@
                 next.innerHTML = '<a href="javascript:goNextExplicit()"><img src="/icons/right.png" height="32px" width="32px"/></a>';
             }
 
-            prevID = nextID = null;
+//            prevID = nextID = null;
+//
+//            for (var ii in currentNode.ins) {
+//                var xi = currentNode.ins[ii];
+//                var id = xi.id;
+//                var relationship = '';
+//                if (xi.via!=null) {
+//                    relationship = xi.via.name;
+//                }
+//                if (relationship == 'next')
+//                    prevID = id;
+//            }
+//            for (var ii in currentNode.outs) {
+//                var xi = currentNode.outs[ii];
+//                var id = xi.id;
+//                var relationship = '';
+//                if (xi.via!=null) {
+//                    relationship = xi.via.name;
+//                }
+//                if (relationship == 'next')
+//                    nextID = id;
+//            }
 
-            for (var ii in currentNode.ins) {
-                var xi = currentNode.ins[ii];
-                var id = xi.id;
-                var relationship = '';
-                if (xi.via!=null) {
-                    relationship = xi.via.name;
-                }
-                if (relationship == 'next')
-                    prevID = id;
-            }
-            for (var ii in currentNode.outs) {
-                var xi = currentNode.outs[ii];
-                var id = xi.id;
-                var relationship = '';
-                if (xi.via!=null) {
-                    relationship = xi.via.name;
-                }
-                if (relationship == 'next')
-                    nextID = id;
-            }
             var status = document.getElementById("Status");
             if ((prevID!=null) || (nextID!=null))
                 status.innerHTML = ((prevID!=null) ? "<--" : "") + " | " + ((nextID!=null) ? "-->" : "");
@@ -259,6 +274,8 @@
     }
 
     function goPrevious() {
+        setEditable(false);
+
         //TODO update through AJAX to avoid reloading entire page
         if (prevID!=null)
            setNode(prevID, null);
@@ -270,6 +287,8 @@
     }
 
     function goNext(f) {
+        setEditable(false);
+        
         //TODO update through AJAX to avoid reloading entire page
         if (nextID!=null)
            setNode(nextID, f);
@@ -288,6 +307,8 @@
             if (f!=null)
                 f();
         });    
+
+        //window.location = '/node/' + id;
         
     }
 
@@ -514,16 +535,37 @@
             currentNode = { }
         
         currentNode.content = $('#_Content').html();
+        
+        var g = $.gritter.add({
+                title: 'Saving New Node',
+                text: 'Standby...'
+        });
+
+        $.post('/agent/' + agentID + '/updatenode', 
+          { 'node': commitNode() },
+          function(data) {
+            $.gritter.remove(g);
+            $.gritter.add({
+                    title: 'Saved',
+                    text: 'Result: ' + data
+            });
+            nodeID = data;
+            node._id = nodeID;
+            loadNodes();
+        });
     }
     
     function ensureContentSaved() {
-        if (confirm("Save edits?")) { 
-            saveContent();
+        if (contentBeforeEdit!=undefined) {
+            if (confirm("Save edits?")) { 
+                saveContent();
+            }
         }
  
    }
     
-    var contentBeforeEdit = '';
+    var contentBeforeEdit = undefined;
+    
     function setEditable(e) {
         widgets['Edit'] = e;
         
@@ -532,11 +574,11 @@
                 ensureContentSaved();
             
            $('#_Content').attr('contentEditable', false);
+           $('#_Content').attr('designMode', '');
            
            highlightButton('EditButton', false);
 
-           $('#EditMenuBar').fadeOut();
-           $('#EditBottom').fadeOut();
+            $("#_ContentBar,#EditBottom,#EditMenuBar").fadeOut();
         }
         else {
             $('#EditMenu').html('<li>Type' + loadTypeMenu(null, getSchemaRoots()) + '</li>');
@@ -547,17 +589,16 @@
                     speed:       'fast'                          // faster animation speed                     
             });
 
-            $('#_Content').attr('contentEditable', true);
 
+            $('#_Content').attr('contentEditable', true);
+            
+            
             highlightButton('EditButton', true);
 
-            $('#EditMenuBar').fadeIn();
-            $('#EditBottom').fadeIn();
-            
+            $("#_ContentBar,#EditBottom,#EditMenuBar").fadeIn();
         }
         contentBeforeEdit = $('#_Content').html();
         
-        showNode(-1);
     }
     function toggleEdit() {
         setEditable(!isEditable());                
@@ -655,7 +696,7 @@ $(document).ready(function(){
     if (w != undefined) {
         widgets = w;
     }
-
+    
     setTheme(currentTheme);
 
 });

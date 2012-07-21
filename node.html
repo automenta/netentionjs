@@ -36,7 +36,16 @@
 
         <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=[PROFILE ID]"></script>
         
+        <script type="text/javascript" src="http://js.nicedit.com/nicEdit-latest.js"></script> <script type="text/javascript"></script>    
+        
         <script src="/nowjs/now.js"></script>
+        <script>
+            
+            now.ready(function(){
+                agentID = now.agentID;
+                console.log('Authenticated as: ' + agentID);
+            });
+        </script>
 
     </head>
     <script>
@@ -61,7 +70,7 @@
                     <ul>
                         <li><a href="/new">New node...</a></li>
                         <li>Duplicate this node...</li>
-                        <li>As Sentences...</li>
+                        <li><a href="javascript:addSentencized()">As Sentences...</a></li>
                         <li><a href="javascript:addRSSFeed()">Add RSS Feed...</a></li>
                         <li>Add Twitter Timeline</li>
                         <li>Add Twitter Search</li>
@@ -90,6 +99,7 @@
                 <li><a href="#" class="tooltip"><img width="48px" height="48px" src="/icons/simplistica/monitor.png" alt="Theme"/><span>Theme</span></a>
                     <ul>
                         <li><a href="javascript:setTheme('default-white')">Black on White</a></li>
+                        <li><a href="javascript:setTheme('default-gray')">Black on Gray</a></li>
                         <li><a href="javascript:setTheme('default-black')">White on Black</a></li>
                         <li><a href="javascript:setTheme('terminal-green')">Terminal Green</a></li>
                         <li><a href="javascript:setTheme('earthspace')">Earth Space</a></li>
@@ -139,6 +149,12 @@
 
                 <li>
                     <a href="#" class="tooltip"><img width="48px" height="48px" src="/icons/star_off.png" alt="Remember"/><span>Remember</span></a>
+                    <ul>
+                        <li><a href="#">Favorites</a></li>
+                        <li><a href="#">Recent</a></li>
+                        <li><a href="#">History</a></li>
+                        <li><a href="#">Frequent</a></li>
+                    </ul>
                 </li>
 
             </ul>
@@ -154,6 +170,7 @@
                 <ul id="EditMenu" class="sf-menu sf-js-enabled xsf-shadow">
                 </ul>            
             </div>
+            <div id="_ContentBar" style="width: 100%; display:none"></div>
             <div id="_Content" contentEditable="false" onMouseOver='onContentMouseOver(this);' onMouseOut='onContentMouseOut(this);'>
             </div>
             <div id="EditBottom" style="display:none">
@@ -162,7 +179,7 @@
 
                     <div id="EditButtons">
                         <button onClick="deleteNode();">Delete</button>
-                        <button onClick="updateNode();">Update</button>
+                        <button onClick="ensureContentSaved();">Update</button>
                     </div>
                     
                     <script>

@@ -17,8 +17,23 @@ root {
     text-align:left;
     font-family:Arial,Sans;
     color: white;
-    width:100%;
 }
+.PanelWide {
+    width:100%;
+    float: none;
+}
+.PanelNarrow {
+    width: 73%;
+    float: right;
+}
+#sidebar {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    height: 90%;
+    max-width: 23%;
+}
+
 #_Content {
     opacity: 0;
     clear:both;
@@ -115,6 +130,23 @@ a, a.visited {
     margin-bottom: 1em;
 
 }
+
+
+
+            #nodelist {
+                height: 100%;
+                width: 100%;
+                overflow: auto;
+            }
+            .nodeWideIcon {
+                padding: 0.25em;
+                background-color: rgba(128, 128, 128, 0.5);
+            }
+            .nodeWideIcon:nth-child(even) {
+                background-color: rgba(148, 148, 148, 0.5)
+            }
+            
+            
 
 
 .menu{

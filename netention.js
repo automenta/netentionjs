@@ -25,7 +25,11 @@ function randomUUID() {
     return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
 }
 
-function updateNode(agentID, nodeID, node) {
+function updateNode(nodeID, node, callback) {
+    var agentID = 'Anonymous';
+    if (nodeID == null)
+        nodeID = randomUUID();
+    
     //console.log(agentID + ' updating node ' + nodeID + ' with ' + node);
     
     db.collection('nodes', function(err, c) {
@@ -40,6 +44,10 @@ function updateNode(agentID, nodeID, node) {
             if (err!=null) {
                 console.log('collection: nodes, save ' + nodeID + ': '+ err);                
             }
+            else {
+                if (callback!=null)
+                    callback(nodeID);
+            }            
         });
     });
     

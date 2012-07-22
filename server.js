@@ -129,7 +129,17 @@ function forEachNode(f/*(n)*/) {
                   var r = results[i];
                   var r2 = { };                  
                   r2._id = r._id;
-                  r2.node = { 'title': r.node.title };
+                  
+                  var maxTitleLength = 32;
+                  var title = r.node.title;
+                  if (title == undefined) {
+                        title = r.node.content;
+                        if (title == undefined) title = '';
+                        if (title.length> maxTitleLength) 
+                            title = title.substring(0, maxTitleLength-1);
+                  }
+   
+                  r2.node = { 'title': title  };
                   f(r2);
               }
            }
@@ -172,7 +182,7 @@ function sentencize(urlOrText, f) {
                     a.next = rootNode + '.' + (i+1);
                 }
 
-                var nt = netention.updateNode(agentID, nodeID, a )
+                var nt = netention.updateNode(nodeID, a, null )
                 lines.push(nt);
                
            }
@@ -180,7 +190,7 @@ function sentencize(urlOrText, f) {
            f(lines);
        }
        else {
-           console.log('ERROR: ' + rss);
+           console.log('ERROR: ' + err);
            f(err);
        }
    }
@@ -231,6 +241,9 @@ useTemplate('/node/:node', 'node.html', function(data, req, res) {
         });
     });        
 });
+useTemplate('/', 'node.html', function(data, req, res) {
+    sendAgentPage(data, res, getAgentID(), 'sidebar(true);');
+});
 
 server.get('/node/:node/json', function(req,res) {
     var nodeID = req.params.node;
@@ -280,9 +293,6 @@ server.get('/node/:node/remove', function(req,res) {
 //    });        
 //});
 
-server.get('/', function(req,res) {
-    res.redirect('/index.html');
-});
 server.get('/login', function(req,res) { res.redirect('/login.html'); });
 
 
@@ -297,7 +307,7 @@ var everyone = require("now").initialize(app);
 //};
 everyone.now.forEachNode = forEachNode;
 everyone.now.sentencize = sentencize;
-
+everyone.now.updateNode = netention.updateNode;
 
 
 // Accept the OpenID identifier and redirect the user to their OpenID

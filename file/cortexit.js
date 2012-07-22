@@ -352,7 +352,8 @@
     }
 
     function _n(content) {
-        nodes.push(content);
+        //nodes.push(content);
+        nodes = [ content ];
     }
 
     function onFrameSpin(e) {
@@ -541,18 +542,22 @@
                 text: 'Standby...'
         });
 
-        $.post('/agent/' + agentID + '/updatenode', 
-          { 'node': commitNode() },
-          function(data) {
-            $.gritter.remove(g);
-            $.gritter.add({
-                    title: 'Saved',
-                    text: 'Result: ' + data
-            });
-            nodeID = data;
-            node._id = nodeID;
-            loadNodes();
+        now.ready(function(){
+           now.updateNode(nodeID, commitNode(), function(nid) {
+                $.gritter.remove(g);
+                $.gritter.add({
+                        title: 'Saved',
+                        text: 'Result: ' + nid
+                });
+                nodeID = nid;
+                node._id = nodeID;
+                //loadNodes();
+                
+                setNode(nid);
+               
+           }); 
         });
+
     }
     
     function ensureContentSaved() {

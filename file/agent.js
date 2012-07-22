@@ -174,6 +174,7 @@ function addType(t, forClass, forProp) {
     types[t] = true;
 }
 
+//deprected
 function updateCode(from, to, text, next) {
     var currentLine = code.getCursor().line;     
     var line = code.getLine(currentLine);
@@ -261,8 +262,7 @@ function setNodeTo(x) {
 
 function setNodeById(n) {
     $.getJSON('/node/' + n + '/json', function(data) {
-        _n(data);
-        showNode(0);
+        setNodeTo(data);
     });
         
 }
@@ -383,6 +383,8 @@ function addRSSFeed() {
     var url = getInputLine("Enter RSS Feed URL", "http://", 'addRSSFeed()');
     
     if (url!=null) {
+        ensureContentSaved();
+
         var x = newSection();
         x.append('Reading RSS: ' + url + '...<br/>');
         $.post('/add/rss', { 'url': url }, function(responseText) {
@@ -397,6 +399,8 @@ function addRSSFeed() {
 function addSentencized() {
     var urlOrText = getInputLine("Enter URL or text", "http://", 'addSentencized()');
     if (urlOrText!=null) {
+        ensureContentSaved();
+        
         var x = newSection();
         x.append('Sentencizing: ' + urlOrText + '...<br/>');
         
@@ -411,7 +415,39 @@ function addSentencized() {
     }
     
 }
-
+            
+function listAllNodes() {
+    now.ready(function(){
+       now.forEachNode(function(f) {
+           var id = f._id;
+           var tx = f.node.title + '';
+           if (tx.length == 0)
+               tx = id;
+           var t = '<div class="nodeWideIcon"> <input name="checkbox.' + id + '" value="" type="checkbox"> <a href="javascript:setNodeById(\'' + id + '\')">' + tx + "</a></div>";
+           $('#nodelist').append(t);
+            
+       });
+    });                
+}
+            
+var showingSidebar = false;
+function sidebar(b) {
+   if (b) {
+       $('#_Panel').removeClass('PanelWide');
+       $('#_Panel').addClass('PanelNarrow');
+       $('#sidebar').fadeIn();
+       listAllNodes();
+   }
+   else {       
+       $('#sidebar').fadeOut();
+       $('#_Panel').removeClass('PanelNarrow');
+       $('#_Panel').addClass('PanelWide');
+   }
+   showingSidebar = b;
+}            
+function toggleSidebar() {
+    sidebar(!showingSidebar);
+}
 
 $(document).ready(function(){
     $.extend($.gritter.options, { 
@@ -425,6 +461,7 @@ $(document).ready(function(){
     myNicEditor.setPanel('_ContentBar');
     myNicEditor.addInstance('_Content');
 
+    
     loadSchema(function() {
         onStart();
     });

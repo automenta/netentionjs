@@ -34,9 +34,8 @@
 
         <link id="themeCSS" rel="stylesheet" type="text/css" />
 
-        <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=[PROFILE ID]"></script>
         
-        <script type="text/javascript" src="http://js.nicedit.com/nicEdit-latest.js"></script> <script type="text/javascript"></script>    
+        <script type="text/javascript" src="http://js.nicedit.com/nicEdit-latest.js"></script>   
         
         <script src="/nowjs/now.js"></script>
         <script>
@@ -81,7 +80,7 @@
                 </li>
                 <li id="EditButton"><a href="javascript:toggleEdit();" class="tooltip"><img width="48px" height="48px" src="/icons/simplistica/page_edit.png" alt="Edit"/><span>Edit</span></a>
                 </li>
-                <li id="NeighborhoodButton"><a href="javascript:showMetadata();" class="tooltip"><img width="48px" height="48px" src="/icons/webapp/Info.png" alt="Metadata"/><span>Neighborhood</span></a>
+                <li id="NeighborhoodButton"><a href="javascript:toggleSidebar();" class="tooltip"><img width="48px" height="48px" src="/icons/webapp/Info.png" alt="Metadata"/><span>Neighborhood</span></a>
                     <ul>
                         <li><a href="javascript:graphIt();" class="tooltip"><img width="16px" height="16px" src="/icons/webapp/LineChart.png" alt="Share"/>Graph</a></li>
                     </ul>
@@ -164,6 +163,10 @@
         </div>
 
 
+        <div id="sidebar" style="display:none">            
+            <button>Nodes</button>
+            <div id="nodelist"></div>
+        </div>
 
         <div id="_Panel">
             <div id="EditMenuBar" style="display:none">
@@ -223,3 +226,4 @@
 
     </body>
 </html>
+<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=[PROFILE ID]"></script>

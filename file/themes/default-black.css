@@ -1,5 +1,6 @@
 #_Panel {
     color: #ddd;
+    margin-top: 4em;
 }
 a {
     color: #fff;
@@ -16,7 +17,12 @@ body {
 
 
 #_Top {
-    background-color: #555;
+    background: none;
+    position: fixed;
+    top:0;
+    left: 0;
+    right:0;
+    width: 100%;
 }
 
 #Status {

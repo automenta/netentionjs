@@ -1,0 +1,61 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<!--
+<html>
+    <head>
+        <title></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+        <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+
+        <script type="text/javascript" src="/superfish/js/hoverIntent.js"></script>
+        <script type="text/javascript" src="/superfish/js/superfish.js"></script>
+
+        <link rel="stylesheet" media="screen" href="/superfish/css/superfish.css" /> 
+        <link rel="stylesheet" media="screen" href="/superfish/css/superfish-vertical.css" /> 
+
+
+        <link rel="stylesheet" type="text/css" href="/gritter/css/jquery.gritter.css" />
+        <script type="text/javascript" src="/gritter/js/jquery.gritter.js"></script>
+        <script type="text/javascript" src="/locache/locache.min.js"></script>
+
+
+        <link rel="stylesheet" type="text/css" href="/style.css" />
+
+        <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-darkness/jquery-ui.css" type="text/css" media="all" />
+        
+        <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js" type="text/javascript"></script>
+
+        <script type="text/javascript" src="/agent.js"></script>
+        <script type="text/javascript" src="/ui.js"></script>
+       
+        <script src="/nowjs/now.js"></script>
+ -->
+        <script>
+            $(document).ready(function(){
+               listAllNodes();
+            });
+            
+        </script>
+            
+<!--    </head>
+    <body> -->
+            <div id="sidebarTop"><button>Nodes</button></div>
+            <div id="nodelist"></div>
+            <div id="sidebarBottom">
+                <select id="bulkOperation">
+                    <option>Synthesize</option>
+                    <option>Delete</option>
+                    <option>Export</option>
+                </select> 
+                <button onclick="javascript:applyBulkOperations();">Apply</button>
+                <button onClick="javascript:sideBarSelectAll();">Select All</button>
+            </div>
+    <!--</body>
+</html>-->

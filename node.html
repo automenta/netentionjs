@@ -54,6 +54,7 @@
 
     <body>
         <div id="sidebar" style="display:none">            
+        <!--
             <div id="sidebarTop"><button>Nodes</button></div>
             <div id="nodelist"></div>
             <div id="sidebarBottom">
@@ -65,7 +66,9 @@
                 <button onclick="javascript:applyBulkOperations();">Apply</button>
                 <button onClick="javascript:sideBarSelectAll();">Select All</button>
             </div>
+        -->
         </div>
+        
 
 
 
@@ -75,7 +78,7 @@
 
             <ul class="sf-menu">
                 <li>
-                    <a href="/new" class="tooltip"><img width="48px" height="48px" src="/icons/simplistica/add.png" alt="New"/><span>New</span></a>
+                    <a href="/new" class="tooltip"><img class="topMenuButton"  src="/icons/simplistica/add.png" alt="New"/><span>New</span></a>
                     <ul>
                         <li><a href="/new">New node...</a></li>
                         <li>Duplicate this node...</li>
@@ -88,15 +91,15 @@
                         <li><a href="/support" class="tooltip"><img width="16px" height="16px" src="/icons/webapp/Comment.png" alt="Translate"/>Translate</a></li>
                     </ul>
                 </li>
-                <li id="EditButton"><a href="javascript:toggleEdit();" class="tooltip"><img width="48px" height="48px" src="/icons/simplistica/page_edit.png" alt="Edit"/><span>Edit</span></a>
+                <li id="EditButton"><a href="javascript:toggleEdit();" class="tooltip"><img class="topMenuButton" src="/icons/simplistica/page_edit.png" alt="Edit"/><span>Edit</span></a>
                 </li>
-                <li id="NeighborhoodButton"><a href="javascript:toggleSidebar();" class="tooltip"><img width="48px" height="48px" src="/icons/webapp/Info.png" alt="Metadata"/><span>Neighborhood</span></a>
+                <li id="NeighborhoodButton"><a href="javascript:toggleSidebar();" class="tooltip"><img class="topMenuButton" src="/icons/webapp/Info.png" alt="Metadata"/><span>Neighborhood</span></a>
                     <ul>
-                        <li><a href="javascript:graphIt();" class="tooltip"><img width="16px" height="16px" src="/icons/webapp/LineChart.png" alt="Share"/>Graph</a></li>
+                        <li><a href="javascript:graphIt();" class="tooltip"><img class="topMenuButton" src="/icons/webapp/LineChart.png" alt="Share"/>Graph</a></li>
                     </ul>
                 </li>
 
-                <li><a href="#" class="tooltip"><img id="speaker_icon" width="48px" height="48px" src="/icons/simplistica/sound.png" alt="Speak"/><span>Speech</span></a>
+                <li><a href="#" class="tooltip"><img id="speaker_icon" class="topMenuButton" src="/icons/simplistica/sound.png" alt="Speak"/><span>Speech</span></a>
                     <ul>
                         <li><a href="javascript:speakSpeech(function() {})">Speak.js Speech (once)</a></li>
                         <li><div style="float:left"><a href="javascript:startSpeakAutoSpeech()">Start Speak.js Autoplay</a></div><div style="float:right"><a href="javascript:stopSpeakAutoSpeech()">Stop</a></div></li>
@@ -163,6 +166,12 @@
                         <li><a href="#">Recent</a></li>
                         <li><a href="#">History</a></li>
                         <li><a href="#">Frequent</a></li>
+                        <li>
+                            <div id="EditButtons">
+                                <button onClick="deleteNode();">Delete</button>
+                                <button onClick="ensureContentSaved();">Update</button>
+                            </div>
+                        </li>
                     </ul>
                 </li>
 
@@ -183,28 +192,7 @@
                 <section id="Edit">
                     <div id="EditStatus"></div>
 
-                    <div id="EditButtons">
-                        <button onClick="deleteNode();">Delete</button>
-                        <button onClick="ensureContentSaved();">Update</button>
-                    </div>
                     
-                    <script>
-                        //deprecated
-                        function apply() {
-                            var t = $('#_Content').text();
-
-                            var mode = document.getElementById('loadmode').value;
-
-                            target = '/add/' + mode;
-
-                            if(target!=null) {
-                                $("#output")  
-                                .html("<img src='/icons/loading.gif' width='200px' height='100px' alt='Loading...'/>")  
-                                .load(target, {content: t});  
-                            }
-
-                        }
-                    </script>
                 </section>            
 
             </div>

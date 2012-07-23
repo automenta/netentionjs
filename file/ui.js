@@ -465,8 +465,14 @@ var widgets = { };
         return d;
     }
     
+    function newWindowGet(theTitle, url) {
+        $.get(url, { }, function(d) {
+           newWindow(theTitle, d); 
+        });
+    }
+    
     function newWindowIFrame(theTitle, url) {
-        newWindow(theTitle, '<iframe src=\"' + url + '\" width="98%" height="98%"></iframe>');
+        newWindow(theTitle, '<iframe src=\"' + url + '\" width="98%" height="98%" style="padding: 0.25em"></iframe>');
     }
     
 
@@ -474,8 +480,10 @@ var widgets = { };
         currentTheme = theme;
 
         var c = document.getElementById("themeCSS");
-        c.href = '/themes/' + theme + '.css';
-        localStorage['theme'] = theme;
+        if (c!=null) {
+            c.href = '/themes/' + theme + '.css';
+            localStorage['theme'] = theme;
+        }
     }
     
 
@@ -677,12 +685,12 @@ if (currentTheme == null) {
 $(document).ready(function(){
     $('#_Speech').fadeToggle();    
 
-    jQuery('#_Top ul.sf-menu').superfish( {
-        delay:       100,                            // one second delay on mouseout 
-        animation:   {opacity:'show',height:'show'},  // fade-in and slide-down animation 
-        speed:       'fast'                          // faster animation speed                     
-    });
-
+//    jQuery('#_Top ul.sf-menu').superfish( {
+//        delay:       100,                            // one second delay on mouseout 
+//        animation:   {opacity:'show',height:'show'},  // fade-in and slide-down animation 
+//        speed:       'fast'                          // faster animation speed                     
+//    });
+    
     var panel = document.getElementById("_Panel");
     var control = document.getElementById("_Control");
     var content = document.getElementById("_Content");
@@ -723,13 +731,17 @@ function sidebar(b) {
    if (b) {
        $('#_Panel').removeClass('PanelWide');
        $('#_Panel').addClass('PanelNarrow');
+       $('#_Top').css('right', '0');
+       $('#sidebar').css('max-width', '23%');
+       $('#sidebar').css('float', 'left');
+       $('#sidebar').load('/browse.html');
        $('#sidebar').show();
-       listAllNodes();
    }
    else {       
        $('#sidebar').hide();
        $('#_Panel').removeClass('PanelNarrow');
        $('#_Panel').addClass('PanelWide');
+       $('#_Top').css('right', '20%');
    }
    showingSidebar = b;
 }            

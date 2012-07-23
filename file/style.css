@@ -27,12 +27,7 @@ root {
     float: right;
 }
 #sidebar {
-    position: fixed;
-    left: 0;
-    bottom: 0%;
-    height: 100%;
-    max-width: 23%;
-    z-index: 500;
+     height: 100%;
 }
 
 #_Content {
@@ -123,13 +118,9 @@ a, a.visited {
 
 
 #_Top {
-    top:0;
-    left:1%;
 
 }
 #_Top ul {
-    margin-bottom: 1em;
-    float: right;
 }
 
 
@@ -250,6 +241,10 @@ a.tooltipAbove:hover span{display:inline; position:absolute;  color:white;} */
         color: #fff;
 }
 
+.topMenuButton {
+    width: 1em; 
+    height: 1em;
+}
 
 .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
     background-color: rgba(128,128,128,0.5);

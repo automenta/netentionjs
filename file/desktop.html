@@ -42,8 +42,9 @@ and open the template in the editor.
                     //console.log('Authenticated as: ' + agentID);
                 });
 
-                var w = newWindow('title', 'Hey!');
-                var ww = newWindow('title2', 'Hey there!');
+                var w = newWindow('Empty <button>button</button>', 'Hey!');
+                var ww = newWindowIFrame('New', '/new');
+                var www = newWindowGet('Browse', '/browse.html');
 
                 var pressed;
                 var lx=-1, ly;
@@ -77,20 +78,23 @@ and open the template in the editor.
                   }
                   lx = x;
                   ly = y;
-                  return false;
+                  return true;
                 });
                 $('#Glass').mousedown(function() {
                     pressed = true;
+                    return true;
                 });
                 $('#Glass').mouseup(function() {
                     pressed = false;
+                    return true;
                 });
             });
         </script>
         <style>
             body {
                 width: 100%;
-                height: 100%;   
+                height: 100%; 
+                overflow:hidden;
             }
             #Glass {
                 width: 100%;

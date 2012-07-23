@@ -1,17 +1,19 @@
 
-    var defaultTheme = 'default-black';
-    var minFrameLength = 8;
-    var pageurl = 'http://cortexit.org';
 
-    var fontSize = 60;
-    var text;
-    var nodes = [];
-    var currentNode;
-    var speechEnabled = false;
-    var prevID = null;
-    var nextID = null;
-    
-    var widgets = { };
+var myNicEditor = null;
+var defaultTheme = 'default-black';
+var minFrameLength = 8;
+var pageurl = 'http://cortexit.org';
+
+var fontSize = 60;
+var text;
+var nodes = [];
+var currentNode;
+var speechEnabled = false;
+var prevID = null;
+var nextID = null;
+
+var widgets = { };
     
     function saveWidgets() {
         locache.set('widgets', widgets);
@@ -458,9 +460,9 @@
         
 //        $('#' + newID).dialog({title: theTitle, width: '60%', height: 450} );
 //        $('#' + newID).fadeIn();
-        w.dialog({title: theTitle, width: '60%', height: 450} );
+        var d = w.dialog({title: theTitle, width: '60%', height: 450} );
         w.fadeIn();
-        return newID;
+        return d;
     }
     
     function newWindowIFrame(theTitle, url) {
@@ -595,6 +597,12 @@
             });
 
 
+            if (myNicEditor == null) {
+                myNicEditor = new nicEditor({fullPanel : true});
+            }
+            myNicEditor.setPanel('_ContentBar');
+            myNicEditor.addInstance('_Content');
+
             $('#_Content').attr('contentEditable', true);
             
             
@@ -681,20 +689,23 @@ $(document).ready(function(){
     var frameSpin = document.getElementById("Status");
     var font = document.getElementById("_Font");
 
-    if (frameSpin.addEventListener) {
-        frameSpin.addEventListener('DOMMouseScroll', onFrameSpin, false);
-        frameSpin.addEventListener('mousewheel', onFrameSpin, false); // Chrome
+    if (frameSpin!=null) {
+        if (frameSpin.addEventListener) {
+            frameSpin.addEventListener('DOMMouseScroll', onFrameSpin, false);
+            frameSpin.addEventListener('mousewheel', onFrameSpin, false); // Chrome
+        }
+        else {
+            frameSpin.onmousewheel = onFrameSpin;
+        }
     }
-    else {
-        frameSpin.onmousewheel = onFrameSpin;
-    }
-
-    if (font.addEventListener) {
-        font.addEventListener('DOMMouseScroll', onFontSpin, false);
-        font.addEventListener('mousewheel', onFontSpin, false); // Chrome
-    }
-    else {
-        font.onmousewheel= onFontSpin;
+    if (font!=null) {
+        if (font.addEventListener) {
+            font.addEventListener('DOMMouseScroll', onFontSpin, false);
+            font.addEventListener('mousewheel', onFontSpin, false); // Chrome
+        }
+        else {
+            font.onmousewheel= onFontSpin;
+        }
     }
 
     var w = locache.get('widgets');
@@ -705,6 +716,63 @@ $(document).ready(function(){
     setTheme(currentTheme);
 
 });
+
+
+var showingSidebar = false;
+function sidebar(b) {
+   if (b) {
+       $('#_Panel').removeClass('PanelWide');
+       $('#_Panel').addClass('PanelNarrow');
+       $('#sidebar').show();
+       listAllNodes();
+   }
+   else {       
+       $('#sidebar').hide();
+       $('#_Panel').removeClass('PanelNarrow');
+       $('#_Panel').addClass('PanelWide');
+   }
+   showingSidebar = b;
+}            
+function toggleSidebar() {
+    sidebar(!showingSidebar);
+}
+function sideBarSelectAll() {
+    $('[id^=sbcheckbox]').each(function(){ this.checked = !this.checked; });
+}
+function applyBulkOperations() {
+    var op = $('#bulkOperation').val();
+    
+    var nodes = [];
+    $('[id^=sbcheckbox]').each(function(){ if (this.checked) {
+            var n = this.id.substring(this.id.indexOf('.')+1);
+            nodes.push(n);
+    } });
+
+    if (op == 'Synthesize') {
+        
+    }
+    else if (op == 'Delete') {
+        var r=confirm("Delete these " + nodes.length + " nodes?");
+        if (r) {
+            now.ready(function(){
+               now.deleteNodes(nodes, function(err) {
+                   if (err == null) {
+                        var g = $.gritter.add({
+                                title: 'Deleted Nodes',
+                                text: nodes.length + ' removed.'
+                        });
+                       
+                        listAllNodes();
+                   }
+                   else {
+                       console.log(err);
+                   }
+               });
+            });
+            
+        }
+    }
+}
 
 <!-- Original:  Ronnie T. Moore Web Site:  The JavaScript Source -->
 <!-- This script and many more are available free online at The JavaScript Source!! http://javascript.internet.com -->

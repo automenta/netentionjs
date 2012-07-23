@@ -30,7 +30,7 @@
         <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js" type="text/javascript"></script>
 
         <script type="text/javascript" src="/agent.js"></script>
-        <script type="text/javascript" src="/cortexit.js"></script>
+        <script type="text/javascript" src="/ui.js"></script>
 
         <link id="themeCSS" rel="stylesheet" type="text/css" />
 
@@ -39,28 +39,38 @@
         
         <script src="/nowjs/now.js"></script>
         <script>
-            
-            now.ready(function(){
-                agentID = now.agentID;
-                console.log('Authenticated as: ' + agentID);
+
+            $(document).ready(function(){
+                onStart = function() { <%- onStart %> };
+
+                now.ready(function(){
+                    agentID = now.agentID;
+                    //console.log('Authenticated as: ' + agentID);
+                });
             });
         </script>
 
     </head>
-    <script>
-        
-        $(document).ready(function(){
-            onStart = function() { <%- onStart %> };
-            $( "#toggleMetadata" ).button().change(function(e) {
-                if ($(this).is(':checked')) {
-                    showMetadata();
-                }
-            });
-        });
-    </script>
 
     <body>
+        <div id="sidebar" style="display:none">            
+            <div id="sidebarTop"><button>Nodes</button></div>
+            <div id="nodelist"></div>
+            <div id="sidebarBottom">
+                <select id="bulkOperation">
+                    <option>Synthesize</option>
+                    <option>Delete</option>
+                    <option>Export</option>
+                </select> 
+                <button onclick="javascript:applyBulkOperations();">Apply</button>
+                <button onClick="javascript:sideBarSelectAll();">Select All</button>
+            </div>
+        </div>
 
+
+
+
+        <div id="_Panel">
         <div id="_Top" class="menu">
 
             <ul class="sf-menu">
@@ -110,8 +120,8 @@
 
                 <li><a href="#" class="tooltip"><img width="48px" height="48px" src="/icons/question.png" alt="Help"/><span>Help</span></a>
                     <ul>
-                        <li><a href="/">What is Cortexit?</a></li>
-                        <li><a href="/bookmarklet">Cortexit Bookmarklet</a></li>
+                        <li><a href="/">What is Netention?</a></li>
+                        <li><a href="/bookmarklet">Netention Bookmarklet</a></li>
                         <li><a href="/privacy">Privacy Policy</a></li>
                         <li><a href="/contact">Contact Us</a></li>
                         <li><a href="/http://en.wikipedia.org/wiki/HTML5">HTML5</a></li>
@@ -162,13 +172,6 @@
 
         </div>
 
-
-        <div id="sidebar" style="display:none">            
-            <button>Nodes</button>
-            <div id="nodelist"></div>
-        </div>
-
-        <div id="_Panel">
             <div id="EditMenuBar" style="display:none">
                 <ul id="EditMenu" class="sf-menu sf-js-enabled xsf-shadow">
                 </ul>            

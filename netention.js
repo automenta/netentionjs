@@ -70,8 +70,29 @@ function newAgent() {
     return { nodes: [] };
 }
 
+function deleteNodes(nodeArray, callback) {
+    db.collection('nodes', function(err, c) {
+        var errs = null;
+        for (var i = 0; i < nodeArray.length; i++) {
+            var n = nodeArray[i];
+            c.remove({_id: n}, {safe:true}, function(err, result) {
+                if (err!=null) {
+                    console.log('ERROR removing: ' + err);
+                    if (errs == null) errs = [ err ];
+                    else errs.push(err);
+                }
+                else {
+                    console.log('Removed ' + result);                    
+                }
+            });
+        }
+        callback(errs);
+    });    
+}
+
 
 exports.db = db;
 exports.updateNode = updateNode;
+exports.deleteNodes = deleteNodes;
 exports.getAgent = getAgent;
 exports.randomUUID = randomUUID;

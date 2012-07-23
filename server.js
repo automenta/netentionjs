@@ -308,6 +308,7 @@ var everyone = require("now").initialize(app);
 everyone.now.forEachNode = forEachNode;
 everyone.now.sentencize = sentencize;
 everyone.now.updateNode = netention.updateNode;
+everyone.now.deleteNodes = netention.deleteNodes;
 
 
 // Accept the OpenID identifier and redirect the user to their OpenID

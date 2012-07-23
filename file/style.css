@@ -29,9 +29,10 @@ root {
 #sidebar {
     position: fixed;
     left: 0;
-    bottom: 0;
-    height: 90%;
+    bottom: 0%;
+    height: 100%;
     max-width: 23%;
+    z-index: 500;
 }
 
 #_Content {
@@ -128,13 +129,13 @@ a, a.visited {
 }
 #_Top ul {
     margin-bottom: 1em;
-
+    float: right;
 }
 
 
 
             #nodelist {
-                height: 100%;
+                height: 85%;
                 width: 100%;
                 overflow: auto;
             }
@@ -145,7 +146,6 @@ a, a.visited {
             .nodeWideIcon:nth-child(even) {
                 background-color: rgba(148, 148, 148, 0.5)
             }
-            
             
 
 

@@ -418,36 +418,22 @@ function addSentencized() {
             
 function listAllNodes() {
     now.ready(function(){
+       $('#nodelist').html('');
+       
        now.forEachNode(function(f) {
            var id = f._id;
            var tx = f.node.title + '';
            if (tx.length == 0)
                tx = id;
-           var t = '<div class="nodeWideIcon"> <input name="checkbox.' + id + '" value="" type="checkbox"> <a href="javascript:setNodeById(\'' + id + '\')">' + tx + "</a></div>";
+           
+           var t = '<div class="nodeWideIcon"> <input id="sbcheckbox.' + id + '" value="" type="checkbox"> <a href="javascript:setNodeById(\'' + id + '\')">' + tx + "</a></div>";
            $('#nodelist').append(t);
             
        });
     });                
 }
             
-var showingSidebar = false;
-function sidebar(b) {
-   if (b) {
-       $('#_Panel').removeClass('PanelWide');
-       $('#_Panel').addClass('PanelNarrow');
-       $('#sidebar').fadeIn();
-       listAllNodes();
-   }
-   else {       
-       $('#sidebar').fadeOut();
-       $('#_Panel').removeClass('PanelNarrow');
-       $('#_Panel').addClass('PanelWide');
-   }
-   showingSidebar = b;
-}            
-function toggleSidebar() {
-    sidebar(!showingSidebar);
-}
+            
 
 $(document).ready(function(){
     $.extend($.gritter.options, { 
@@ -457,10 +443,7 @@ $(document).ready(function(){
             time: 4000 // hang on the screen for...
     });        
     
-    var myNicEditor = new nicEditor({fullPanel : true});
-    myNicEditor.setPanel('_ContentBar');
-    myNicEditor.addInstance('_Content');
-
+    
     
     loadSchema(function() {
         onStart();

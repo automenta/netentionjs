@@ -17,14 +17,14 @@ body {
 
 
 #_Top {
-    background: none;
     position: fixed;
     top:0;
-    left: 0;
     right:0;
-    width: 100%;
 }
 
+#_Top ul {
+    background-color: rgba(128, 128, 128, 0.75);    
+}
 #Status {
     color: white;
 }

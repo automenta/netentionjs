@@ -91,13 +91,9 @@ root {
 }
 
 #Status {
-    font-size: 30px;
-    font-family: Arial, Sans;
     cursor: crosshair;
 }
 #_Font {
-    font-size: 30px;
-    font-family: Arial, Sans;
     cursor: crosshair;
 }
 
@@ -177,7 +173,7 @@ a, a.visited {
     padding-right: 0;
 }
 .MenuButtonHighlighted {
-    background-color: white;
+    /*background-color: white;*/
 }
 
 
@@ -236,14 +232,23 @@ a.tooltipAbove:hover span{display:inline; position:absolute;  color:white;} */
 }
 .sf-menu li:hover, .sf-menu li.sfHover,
 .sf-menu a:focus, .sf-menu a:hover, .sf-menu a:active {
-	background-color:		#454545;
+/*	background-color:		#454545;
 	outline:		0;
-        color: #fff;
+        color: #fff;*/
+}
+.sf-menu li:hover, .sf-menu li.sfHover, .sf-menu a:focus, .sf-menu a:hover, .sf-menu a:active {
+    /*background: #CFCFCF;
+    outline: 0;*/
+    background: none;
 }
 
 .topMenuButton {
-    width: 1em; 
-    height: 1em;
+    width: 1.5em; 
+    height: 1.5em;
+}
+#_Top button {
+    background: none;
+    border: none;
 }
 
 .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
@@ -267,11 +272,7 @@ a.tooltipAbove:hover span{display:inline; position:absolute;  color:white;} */
 #EditButtons {
     float: right;
 }
-.CodeMirror {
-    line-height: 1.5em;
-    font-family: "monospace", arial, sans;
-    font-size: 1.5em;
-}
+
 #listArea {
     float: left;
     width: 22%;

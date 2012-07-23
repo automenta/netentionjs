@@ -593,7 +593,7 @@ var widgets = { };
            
            highlightButton('EditButton', false);
 
-            $("#_ContentBar,#EditBottom,#EditMenuBar").fadeOut();
+            $("#_ContentBar,#EditBottom,#EditMenuBar").hide();
         }
         else {
             $('#EditMenu').html('<li>Type' + loadTypeMenu(null, getSchemaRoots()) + '</li>');
@@ -607,16 +607,16 @@ var widgets = { };
 
             if (myNicEditor == null) {
                 myNicEditor = new nicEditor({fullPanel : true});
+                myNicEditor.setPanel('_ContentBar');
+                myNicEditor.addInstance('_Content');
             }
-            myNicEditor.setPanel('_ContentBar');
-            myNicEditor.addInstance('_Content');
 
             $('#_Content').attr('contentEditable', true);
             
             
             highlightButton('EditButton', true);
 
-            $("#_ContentBar,#EditBottom,#EditMenuBar").fadeIn();
+            $("#_ContentBar,#EditBottom,#EditMenuBar").show();
         }
         contentBeforeEdit = $('#_Content').html();
         

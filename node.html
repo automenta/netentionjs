@@ -78,7 +78,7 @@
 
             <ul class="sf-menu">
                 <li>
-                    <a href="/new" class="tooltip"><img class="topMenuButton"  src="/icons/simplistica/add.png" alt="New"/><span>New</span></a>
+                    <button onclick="document.location='/new';"><img class="topMenuButton"  src="/icons/simplistica/add.png" alt="New"/></button>
                     <ul>
                         <li><a href="/new">New node...</a></li>
                         <li>Duplicate this node...</li>
@@ -91,9 +91,11 @@
                         <li><a href="/support" class="tooltip"><img width="16px" height="16px" src="/icons/webapp/Comment.png" alt="Translate"/>Translate</a></li>
                     </ul>
                 </li>
-                <li id="EditButton"><a href="javascript:toggleEdit();" class="tooltip"><img class="topMenuButton" src="/icons/simplistica/page_edit.png" alt="Edit"/><span>Edit</span></a>
+                <li>
+                    <button onclick="javascript:toggleEdit();"><img class="topMenuButton" src="/icons/simplistica/page_edit.png" alt="Edit"/></button>
                 </li>
-                <li id="NeighborhoodButton"><a href="javascript:toggleSidebar();" class="tooltip"><img class="topMenuButton" src="/icons/webapp/Info.png" alt="Metadata"/><span>Neighborhood</span></a>
+                <li id="NeighborhoodButton">
+                    <button onclick="toggleSidebar();"><img class="topMenuButton" src="/icons/webapp/Info.png" alt="Metadata"/></button>
                     <ul>
                         <li><a href="javascript:graphIt();" class="tooltip"><img class="topMenuButton" src="/icons/webapp/LineChart.png" alt="Share"/>Graph</a></li>
                     </ul>
@@ -107,21 +109,22 @@
                     </ul>
                 </li>                
 
-                <li><a href="javascript:imageIt();" class="tooltip"><img width="48px" height="48px" src="/icons/webapp/Picture.png" alt="Images"/><span>Images</span></a></li>
-                <li><a href="#" class="tooltip"><img width="48px" height="48px" src="/icons/simplistica/monitor.png" alt="Theme"/><span>Theme</span></a>
-                    <ul>
-                        <li><a href="javascript:setTheme('default-white')">Black on White</a></li>
-                        <li><a href="javascript:setTheme('default-gray')">Black on Gray</a></li>
-                        <li><a href="javascript:setTheme('default-black')">White on Black</a></li>
-                        <li><a href="javascript:setTheme('terminal-green')">Terminal Green</a></li>
-                        <li><a href="javascript:setTheme('earthspace')">Earth Space</a></li>
-                        <li><a href="javascript:setTheme('concrete')">Concrete</a></li>
-                        <li><a href="javascript:setTheme('chalkboard')">Chalkboard</a></li>
-                    </ul>
+                <li><a href="javascript:imageIt();" class="tooltip"><img class="topMenuButton" src="/icons/webapp/Picture.png" alt="Images"/><span>Images</span></a></li>
+                
+                <li>
+                    <select onchange="setTheme(this.value);" >
+                        <option value="default-white">Black on White</option>
+                        <option value="default-gray">Black on Gray</option>
+                        <option value="default-black">White on Black</option>
+                        <option value="terminal-green">Terminal Green</option>
+                        <option value="earthspace">Earth Space</option>
+                        <option value="concrete">Concrete</option>
+                        <option value="chalkboard">Chalkboard</option>
+                    </select>
                 </li>
-                <li><a href="javascript:shareIt();" class="tooltip"><img width="48px" height="48px" src="/icons/simplistica/mail_sent.png" alt="Share"/><span>Share</span></a>
+                <li><a href="javascript:shareIt();" class="tooltip"><img class="topMenuButton" src="/icons/simplistica/mail_sent.png" alt="Share"/><span>Share</span></a>
 
-                <li><a href="#" class="tooltip"><img width="48px" height="48px" src="/icons/question.png" alt="Help"/><span>Help</span></a>
+                <li><a href="#" class="tooltip"><img class="topMenuButton" src="/icons/question.png" alt="Help"/><span>Help</span></a>
                     <ul>
                         <li><a href="/">What is Netention?</a></li>
                         <li><a href="/bookmarklet">Netention Bookmarklet</a></li>
@@ -147,20 +150,20 @@
                                 &nbsp;
                             </td>
                             <td align="left">
-                                <a href="javascript:fontSmaller()"><img src="/icons/minus.png" height="32px" width="32px" title="Smaller Font"/></a>
+                                <a href="javascript:fontSmaller()"><img src="/icons/minus.png" class="topMenuButton" title="Smaller Font"/></a>
                             </td>
                             <td align="center" id="_Font" >                    
                                 &nbsp; Abc &nbsp;
                             </td>
                             <td align="right">
-                                <a href="javascript:fontLarger()"><img src="/icons/plus.png" height="32px" width="32px" title="Larger Font"/></a>
+                                <a href="javascript:fontLarger()"><img src="/icons/plus.png" class="topMenuButton" title="Larger Font"/></a>
                             </td>
                         </tr>
                     </table>
                 </li>
 
                 <li>
-                    <a href="#" class="tooltip"><img width="48px" height="48px" src="/icons/star_off.png" alt="Remember"/><span>Remember</span></a>
+                    <a href="#" class="tooltip"><img class="topMenuButton" src="/icons/star_off.png" alt="Remember"/><span>Remember</span></a>
                     <ul>
                         <li><a href="#">Favorites</a></li>
                         <li><a href="#">Recent</a></li>

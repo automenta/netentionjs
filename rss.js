@@ -9,9 +9,8 @@ function addRSS(url, f) {
     parser.parseUrl(url,  function (error, meta, articles) {
       //https://github.com/danmactough/node-feedparser
 
-      var agentID = 'rss';
-
-      netention.getAgent(agentID, function(a) { });
+      //var agentID = 'rss';
+      //netention.getAgent(agentID, function(a) { });
 
       if (error) console.error(error);
       else {
@@ -24,18 +23,25 @@ function addRSS(url, f) {
         
         articles.forEach(function (article){
           //var nodeID = article.guid;
-          var nodeID = netention.randomUUID();
-
-          article.content = article.title + '\n' + article.description;
-          delete article.title;
+          var nodeID = article.guid;
+          
+          //article.content = article.title + '\n' + article.description;
+          article.content = article.title + '<br/>' + article.description;
+          
+          delete article.summary;
           delete article.description;
-
+          delete article.meta;
+          delete article['rss:description'];
+          delete article['rss:link'];
+          delete article['rss:title'];
+          
+          article.types = [ 'Document' ];
+                    
           //console.log('%s - %s (%s)', article.date, article.title, article.link);
-          var n = netention.updateNode(agentID, nodeID, article)
+          var n = netention.updateNode(nodeID, article, null)
           nodes.push(n);
         });        
         
-        console.log(nodes);        
         f(nodes);
 
       }

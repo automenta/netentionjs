@@ -34,6 +34,7 @@
 
         <link id="themeCSS" rel="stylesheet" type="text/css" />
 
+        <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
         
         <script type="text/javascript" src="http://js.nicedit.com/nicEdit-latest.js"></script>   
         
@@ -78,7 +79,7 @@
 
             <ul class="sf-menu">
                 <li>
-                    <button onclick="document.location='/new';"><img class="topMenuButton"  src="/icons/simplistica/add.png" alt="New"/></button>
+                    <!--<button onclick="document.location='/new';">--><img class="topMenuButton"  src="/icons/simplistica/add.png" alt="New"/>
                     <ul>
                         <li><a href="/new">New node...</a></li>
                         <li>Duplicate this node...</li>
@@ -101,7 +102,7 @@
                     </ul>
                 </li>
 
-                <li><a href="#" class="tooltip"><img id="speaker_icon" class="topMenuButton" src="/icons/simplistica/sound.png" alt="Speak"/><span>Speech</span></a>
+                <li><a href="#" class="tooltip"><img id="speaker_icon" class="topMenuButton" src="/icons/simplistica/sound.png" alt="Speak"/></a>
                     <ul>
                         <li><a href="javascript:speakSpeech(function() {})">Speak.js Speech (once)</a></li>
                         <li><div style="float:left"><a href="javascript:startSpeakAutoSpeech()">Start Speak.js Autoplay</a></div><div style="float:right"><a href="javascript:stopSpeakAutoSpeech()">Stop</a></div></li>
@@ -109,7 +110,7 @@
                     </ul>
                 </li>                
 
-                <li><a href="javascript:imageIt();" class="tooltip"><img class="topMenuButton" src="/icons/webapp/Picture.png" alt="Images"/><span>Images</span></a></li>
+                <li><a href="javascript:imageIt();" class="tooltip"><img class="topMenuButton" src="/icons/webapp/Picture.png" alt="Images"/></a></li>
                 
                 <li>
                     <select onchange="setTheme(this.value);" >
@@ -122,9 +123,9 @@
                         <option value="chalkboard">Chalkboard</option>
                     </select>
                 </li>
-                <li><a href="javascript:shareIt();" class="tooltip"><img class="topMenuButton" src="/icons/simplistica/mail_sent.png" alt="Share"/><span>Share</span></a>
+                <li><a href="javascript:shareIt();" class="tooltip"><img class="topMenuButton" src="/icons/simplistica/mail_sent.png" alt="Share"/></a>
 
-                <li><a href="#" class="tooltip"><img class="topMenuButton" src="/icons/question.png" alt="Help"/><span>Help</span></a>
+                <li><a href="#" class="tooltip"><img class="topMenuButton" src="/icons/question.png" alt="Help"/></a>
                     <ul>
                         <li><a href="/">What is Netention?</a></li>
                         <li><a href="/bookmarklet">Netention Bookmarklet</a></li>

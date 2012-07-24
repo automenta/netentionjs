@@ -1,7 +1,6 @@
 var express = require('express');
 var ejs = require('ejs');
 var fs = require('fs');
-var apricot = require('apricot').Apricot;
 
 var netention = require('./netention');
 var rss = require('./rss');
@@ -121,96 +120,8 @@ function withNode(nodeID, f/*(n)*/) {
         });
    });        
 }
-function forEachNode(f/*(n)*/) {
-   netention.db.collection('nodes', function(err, c) {
-       c.find( { 'node' : { $exists : true } } ).toArray(function(err, results) {
-           if (results!=null) {
-              for (var i = 0; i < results.length; i++) {
-                  var r = results[i];
-                  var r2 = { };                  
-                  r2._id = r._id;
-                  
-                  var maxTitleLength = 32;
-                  var title = r.node.title;
-                  if (title == undefined) {
-                        title = r.node.content;
-                        if (title == undefined) title = '';
-                        if (title.length> maxTitleLength) 
-                            title = title.substring(0, maxTitleLength-1);
-                  }
-   
-                  r2.node = { 'title': title  };
-                  f(r2);
-              }
-           }
-       });
-   });
-    
-}
 
-function sentencize(urlOrText, f) {
-   
-   var rootNode;
-   
-   var p = function(err, doc) {
-       if (err==null) {
-           var str = doc.toHTML;
-           str=str.replace(/<br>/gi, "\n");
-           str=str.replace(/<p.*>/gi, "\n");
-           str=str.replace(/<a.*href="(.*?)".*>(.*?)<\/a>/gi, " $2 (Link->$1) ");
-           str=str.replace(/<(?:.|\s)*?>/g, "");
-                          
-           var linesPreFilter = str.split("\n");
-           var slines = [];
-           var i;
-           for (i = 0; i < linesPreFilter.length; i++) {
-               var t = linesPreFilter[i].trim();               
-               if (t.length > 0) {
-                   slines.push(t);
-               }                  
-           }    
-           
-           var lines = [];
-           for (i = 0; i < slines.length; i++) {
-                var nodeID = rootNode + '.' + i;
-                var agentID = 'sentencize';
-                var a = { content: slines[i] };
-                if (i > 0) {
-                    a.previous = rootNode + '.' + (i-1);
-                }
-                if (i < slines.length-1) {
-                    a.next = rootNode + '.' + (i+1);
-                }
 
-                var nt = netention.updateNode(nodeID, a, null )
-                lines.push(nt);
-               
-           }
-           
-           f(lines);
-       }
-       else {
-           console.log('ERROR: ' + err);
-           f(err);
-       }
-   }
-   
-   if (urlOrText.indexOf('http://')==0) {
-       rootNode = urlOrText;
-       rootNode = rootNode.replace(/http:\/\//g, "");
-       rootNode = rootNode.replace(/\//g, "_");
-       //rootNode = netention.randomUUID();
-       apricot.open(urlOrText, p, true);
-   }
-   else {
-       var summaryLength = 16;
-       if (urlOrText.length < summaryLength)
-           summaryLenth = urlOrText.length;
-       rootNode = urlOrText.substring(0, summaryLength);
-       rootNode = encodeURIComponent(rootNode);
-       apricot.parse(urlOrText, p);       
-   }
-}
 
 
 server.post('/add/rss', function(req, res) {
@@ -297,29 +208,30 @@ server.get('/login', function(req,res) { res.redirect('/login.html'); });
 
 
 
- 
-var app = server.listen(9090);
+netention.start(function() {
+    var app = server.listen(9090);
 
-var everyone = require("now").initialize(app);
+    var everyone = require("now").initialize(app);
 
-//everyone.now.distributeMessage = function(message){
-//  everyone.now.receiveMessage(this.now.name, message);
-//};
-everyone.now.forEachNode = forEachNode;
-everyone.now.sentencize = sentencize;
-everyone.now.updateNode = netention.updateNode;
-everyone.now.deleteNodes = netention.deleteNodes;
+    //everyone.now.distributeMessage = function(message){
+    //  everyone.now.receiveMessage(this.now.name, message);
+    //};
+    everyone.now.forEachNode = netention.forEachNode;
+    everyone.now.addSentencized = netention.addSentencized;
+    everyone.now.updateNode = netention.updateNode;
+    everyone.now.deleteNodes = netention.deleteNodes;
 
 
-// Accept the OpenID identifier and redirect the user to their OpenID
-// provider for authentication.  When complete, the provider will redirect
-// the user back to the application at
-// /auth/openid/return
-server.post('/auth/openid', passport.authenticate('openid'));
+    // Accept the OpenID identifier and redirect the user to their OpenID
+    // provider for authentication.  When complete, the provider will redirect
+    // the user back to the application at
+    // /auth/openid/return
+    server.post('/auth/openid', passport.authenticate('openid'));
 
-// The OpenID provider has redirected the user back to the application.
-// Finish the authentication process by verifying the assertion.  If valid,
-// the user will be logged in.  Otherwise, authentication has failed.
-server.get('/auth/openid/return', 
-  passport.authenticate('openid', { successRedirect: '/',
-                                    failureRedirect: '/login' }));
+    // The OpenID provider has redirected the user back to the application.
+    // Finish the authentication process by verifying the assertion.  If valid,
+    // the user will be logged in.  Otherwise, authentication has failed.
+    server.get('/auth/openid/return', 
+      passport.authenticate('openid', { successRedirect: '/',
+                                        failureRedirect: '/login' }));    
+});

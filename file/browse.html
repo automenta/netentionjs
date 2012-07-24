@@ -39,14 +39,22 @@ and open the template in the editor.
  -->
         <script>
             $(document).ready(function(){
-               listAllNodes();
+               browseNodes();
             });
             
         </script>
             
 <!--    </head>
     <body> -->
-            <div id="sidebarTop"><button>Nodes</button></div>
+            <div id="sidebarTop">
+                <button onclick="browseNodes();">Nodes</button>
+                <button>Inbox</button>
+                <button>Recent</button>
+                <button>Frequent</button>
+                <button onclick="browseWhere();">Where</button>
+                <button>Favorite</button>
+                <button>Active</button> <!-- items that are "active" -->
+            </div>
             <div id="nodelist"></div>
             <div id="sidebarBottom">
                 <button onClick="javascript:sideBarSelectAll();">Invert All</button>

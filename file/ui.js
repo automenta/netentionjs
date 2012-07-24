@@ -732,7 +732,7 @@ function sidebar(b) {
        $('#_Panel').removeClass('PanelWide');
        $('#_Panel').addClass('PanelNarrow');
        $('#_Top').css('right', '0');
-       $('#sidebar').css('max-width', '23%');
+       $('#sidebar').css('max-width', '25%');
        $('#sidebar').css('float', 'left');
        $('#sidebar').load('/browse.html');
        $('#sidebar').show();

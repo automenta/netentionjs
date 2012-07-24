@@ -340,7 +340,7 @@ function setNodeList() {
     
     now.ready(function(){
 
-        now.forEachNode(function(data) {
+        now.forEachNode({}, function(data) {
             var title = data.node.title;
             if (title == undefined) title = data._id;
             if (title.indexOf('\n')!=-1)
@@ -405,7 +405,7 @@ function addSentencized() {
         x.append('Sentencizing: ' + urlOrText + '...<br/>');
         
         now.ready(function(){
-            now.sentencize( urlOrText , function( items ) {
+            now.addSentencized( urlOrText , function( items ) {
                 for (var i = 0; i < items.length; i++) {
                     var r = items[i];
                     x.append('<li><a href="/node/' + r + '">' + r + "</a></i>");
@@ -416,11 +416,11 @@ function addSentencized() {
     
 }
             
-function listAllNodes() {
+function browseNodes() {
     now.ready(function(){
        $('#nodelist').html('');
        
-       now.forEachNode(function(f) {
+       now.forEachNode({}, function(f) {
            var id = f._id;
            var tx = f.node.title + '';
            if (tx.length == 0)
@@ -431,6 +431,22 @@ function listAllNodes() {
             
        });
     });                
+}
+function browseWhere() {
+    //now.ready(function(){
+       $('#nodelist').load('/browse.map.html');
+       
+//       now.forEachNode(function(f) {
+//           var id = f._id;
+//           var tx = f.node.title + '';
+//           if (tx.length == 0)
+//               tx = id;
+//           
+//           var t = '<div class="nodeWideIcon"> <input id="sbcheckbox.' + id + '" value="" type="checkbox"> <a href="javascript:setNodeById(\'' + id + '\')">' + tx + "</a></div>";
+//           $('#nodelist').append(t);
+//            
+//       });
+    //});                
 }
             
             

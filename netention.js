@@ -101,27 +101,31 @@ function forEachNodeOLD(f/*(n)*/) {
     
 }
 
+function finalizeNode(n) {
+    var maxTitleLength = 32;
+                        
+    var title = n.node.title;
+    if (title == undefined) {
+          title = n.node.content;
+          if (title == undefined) title = '';
+          if (title.length> maxTitleLength) 
+              title = title.substring(0, maxTitleLength-1);
+    }
+    n.node.title = title;
+    return n;   
+}
+
 function forEachNode(query, forEach, whenFinished) {
     db.collection('nodes', function(err, c) {
         var stream = c.find(query).streamRecords();
+        if ((whenFinished!=null) && (whenFinished!=undefined))
+            stream.on("end", whenFinished);           
         stream.on("data", function(n) {
-            var maxTitleLength = 32;
-                        
             if (n.node!=undefined) {
-                var title = n.node.title;
-                if (title == undefined) {
-                      title = n.node.content;
-                      if (title == undefined) title = '';
-                      if (title.length> maxTitleLength) 
-                          title = title.substring(0, maxTitleLength-1);
-                }
-                n.node.title = title;
-                forEach(n);
+                forEach(finalizeNode(n));
             }
         });
         
-        if ((whenFinished!=null) && (whenFinished!=undefined))
-            stream.on("end", whenFinished);           
     });
 }
 
@@ -206,12 +210,13 @@ function parseContent(c) {
      return { text: t, 'properties': properties };
 }
 
-function links(nodeOrNodeID, forEach, whenFinished) {
+function forEachLink(nodeOrNodeID, forEach/*(node, reasons)*/, whenFinished) {
     var n = nodeOrNodeID;
     if (n.length != undefined) {
         getNode(n, function(f) {
-            links(f, forEach, whenFinished);
+            forEachLink(f.node, forEach, whenFinished);
         });
+        return;
     }
     
     //var c = parseContent(n.content);
@@ -230,7 +235,8 @@ function links(nodeOrNodeID, forEach, whenFinished) {
         var fulltext = n.content;
         var r = {$regex : "(?i)^.*" + fulltext + ".*$"};
         forEachNode( { "node.content": r}, function(x) {
-            forEach(x);
+            if (x._id!=n._id)
+                forEach(finalizeNode(x), ['matches text']);
         }, whenFinished);
     }
 }
@@ -316,7 +322,7 @@ exports.updateNode = updateNode;
 exports.deleteNodes = deleteNodes;
 exports.getAgent = getAgent;
 exports.randomUUID = randomUUID;
-exports.links = links;
+exports.forEachLink = forEachLink;
 exports.addSentencized = addSentencized;
 exports.parseContent = parseContent;
 exports.reset = reset;

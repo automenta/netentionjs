@@ -220,7 +220,7 @@ netention.start(function() {
     everyone.now.addSentencized = netention.addSentencized;
     everyone.now.updateNode = netention.updateNode;
     everyone.now.deleteNodes = netention.deleteNodes;
-
+    everyone.now.forEachLink = netention.forEachLink;
 
     // Accept the OpenID identifier and redirect the user to their OpenID
     // provider for authentication.  When complete, the provider will redirect

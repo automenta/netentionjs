@@ -258,7 +258,9 @@ function editNode(id) {
 function setNodeTo(x) {
     _n(x);
     showNode(0);
+    updateLinks();
 }
+
 
 function setNodeById(n) {
     $.getJSON('/node/' + n + '/json', function(data) {

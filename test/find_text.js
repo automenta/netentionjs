@@ -5,7 +5,7 @@ console.log('Searching...');
 
 var text = process.argv[2];
 
-netention.links( { 'content': text }, function(node) {
+netention.forEachLink( { 'content': text }, function(node, reason) {
     console.log(node);
 }, function() {
     console.log('Finished');

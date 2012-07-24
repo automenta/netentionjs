@@ -38,6 +38,9 @@ root {
     -moz-transition: opacity 0.5s ease-in-out; //for mozilla firefox
     -o-transition: opacity 0.5s ease-in-out; //for opera
 }
+#nodeLinks {
+    margin: 1em;    
+}
 #Neighborhood {
     left:2.5%;
     bottom: 5%;

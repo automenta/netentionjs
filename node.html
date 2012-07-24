@@ -170,12 +170,6 @@
                         <li><a href="#">Recent</a></li>
                         <li><a href="#">History</a></li>
                         <li><a href="#">Frequent</a></li>
-                        <li>
-                            <div id="EditButtons">
-                                <button onClick="deleteNode();">Delete</button>
-                                <button onClick="ensureContentSaved();">Update</button>
-                            </div>
-                        </li>
                     </ul>
                 </li>
 
@@ -188,17 +182,20 @@
             <div id="EditMenuBar" style="display:none">
                 <ul id="EditMenu" class="sf-menu sf-js-enabled xsf-shadow">
                 </ul>            
+                <div id="EditButtons">
+                    <button onClick="deleteNode();">Delete</button>
+                    <button onClick="ensureContentSaved();">Update</button>
+                </div>
             </div>
+
             <div id="_ContentBar" style="width: 100%; display:none"></div>
             <div id="_Content" contentEditable="false" onMouseOver='onContentMouseOver(this);' onMouseOut='onContentMouseOut(this);'>
             </div>
+            <div id="nodeLinks"></div>
             <div id="EditBottom" style="display:none">
                 <section id="Edit">
                     <div id="EditStatus"></div>
-
-                    
                 </section>            
-
             </div>
 
             <div id="sections"></div>

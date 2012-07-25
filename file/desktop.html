@@ -55,8 +55,9 @@ and open the template in the editor.
                   y = event.pageY;
                   if (lx!=-1) {
                       if (pressed) {
-                        var dx = x - lx;
-                        var dy = y - ly;
+                        var m = 2.0;
+                        var dx = (x - lx) * m;
+                        var dy = (y - ly) * m;
                        
                         $('[id^=Window]').each(function(){ 
                             var ii = this.id;

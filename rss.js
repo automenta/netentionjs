@@ -27,6 +27,7 @@ function addRSS(url, f) {
           
           //article.content = article.title + '\n' + article.description;
           article.content = article.title + '<br/>' + article.description;
+          article.when = Date.parse(article.date);
           
           delete article.summary;
           delete article.description;

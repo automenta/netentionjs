@@ -134,6 +134,7 @@ function getNode(nodeID, f) {
     db.collection('nodes', function(err, c) {
         c.findOne({ '_id': nodeID}, function(err, node) {
             if (err==null) {
+                node._id = nodeID;
                 f(node);
             }
             else {

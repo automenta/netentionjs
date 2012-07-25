@@ -201,7 +201,6 @@ function showNode(f) {
         if (currentNode._id!=undefined) {
             nodeID = currentNode._id;
         }
-        contentBeforeEdit = currentNode.content;
 
         
         var content = document.getElementById("_Content");
@@ -210,8 +209,10 @@ function showNode(f) {
     }
     else {
     }
-        
+    
+    
     setEditable(isEditable());
+    
 
 
     if (currentNode!=null) {
@@ -292,7 +293,6 @@ function showNode(f) {
 }
 
 function goPrevious() {
-    setEditable(false);
 
     //TODO update through AJAX to avoid reloading entire page
     if (prevID!=null)
@@ -305,7 +305,6 @@ function goNext() {
 }
 
 function goNext(f) {
-    setEditable(false);
         
     //TODO update through AJAX to avoid reloading entire page
     if (nextID!=null)
@@ -595,15 +594,15 @@ function saveContent() {
 }
     
 function ensureContentSaved(bypassConfirmation) {
-    if (contentBeforeEdit!=undefined) {
+    if (contentBeforeEdit!=null) {
         if (contentBeforeEdit!=$('#_Content').html()) {
-            if ((bypassConfirmation=null) || (bypassConfirmation==false)) {
-                if (confirm("Save edits?")) { 
-                    saveContent();
-                }
+            if (bypassConfirmation == true) {
+                saveContent();
             }
             else {
-                saveContent();
+                if (confirm("Save edits?")) { 
+                    saveContent();
+                }                
             }
         }
         else {
@@ -632,14 +631,15 @@ function updateLinks() {
     });
 }
     
-var contentBeforeEdit = undefined;
+var contentBeforeEdit = null, wasEdited = false;
     
 function setEditable(e) {
     widgets['Edit'] = e;
         
     if (!e) {
-        if (contentBeforeEdit != $('#_Content').html())
-            ensureContentSaved();
+        if (wasEdited)
+            if (contentBeforeEdit != $('#_Content').html())
+                ensureContentSaved();
             
         $('#_Content').attr('contentEditable', false);
         $('#_Content').attr('designMode', '');
@@ -647,8 +647,12 @@ function setEditable(e) {
         highlightButton('EditButton', false);
 
         $("#_ContentBar,#EditBottom,#EditMenuBar").hide();
+        wasEdited = false;
     }
     else {
+        wasEdited = true;
+        contentBeforeEdit = $('#_Content').html();
+        
         $('#EditMenu').html('<li>Type' + loadTypeMenu(null, getSchemaRoots()) + '</li>');
 
         $('ul.sf-menu').superfish( {
@@ -676,7 +680,6 @@ function setEditable(e) {
 
         $("#_ContentBar,#EditBottom,#EditMenuBar").show();
     }
-    contentBeforeEdit = $('#_Content').html();
         
 }
 function toggleEdit() {

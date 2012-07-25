@@ -196,18 +196,15 @@ function showNode(f) {
     disableVozmeSpeech();
 
     if (f > -1) {
-        currentNode = nodes[f];
-        
-        if (currentNode._id!=undefined) {
-            nodeID = currentNode._id;
-        }
-
+        currentNode = nodes[f];       
+        nodeID = currentNode._id;
         
         var content = document.getElementById("_Content");
         content.innerHTML = renderMainContent(currentNode);
 
     }
     else {
+        currentNode = null;
     }
     
     
@@ -594,28 +591,25 @@ function saveContent() {
 }
     
 function ensureContentSaved(bypassConfirmation) {
-    if (contentBeforeEdit!=null) {
-        if (contentBeforeEdit!=$('#_Content').html()) {
-            if (bypassConfirmation == true) {
-                saveContent();
-            }
-            else {
-                if (confirm("Save edits?")) { 
-                    saveContent();
-                }                
-            }
+    if (wasEdited) {
+        if (bypassConfirmation == true) {
+            saveContent();
         }
         else {
-            updateLinks();            
-        }            
+            if (confirm("Save edits?")) { 
+                saveContent();
+            }                
+        }
     }
     else {
-        saveContent();
-    }
+        updateLinks();            
+    }            
  
 }
 
 function updateLinks() {
+    if (currentNode==null) return;
+    
     var n = $('#nodeLinks');
     n.html('');
     now.ready(function(){

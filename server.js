@@ -93,7 +93,7 @@ function sendAgentPage(data, res, agentID, onStartCode) {
 
 
 useTemplate('/new', 'node.html', function(data, req, res) {
-    var x = { content: '' };
+    var x = { _id: netention.randomUUID(), content: '' };
     sendAgentPage(data, res, getAgentID(), 'setNodeTo(\'' + JSON.stringify(x) + '\');');
 });
 

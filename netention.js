@@ -44,7 +44,7 @@ function randomUUID() {
 
 function updateNode(nodeID, node, callback) {
     var agentID = 'Anonymous';
-    if (nodeID == null)
+    if ((nodeID == null) || (nodeID == undefined))
         nodeID = randomUUID();
     
     //console.log(agentID + ' updating node ' + nodeID + ' with ' + node);
@@ -213,6 +213,11 @@ function parseContent(c) {
 
 function forEachLink(nodeOrNodeID, forEach/*(node, reasons)*/, whenFinished) {
     var n = nodeOrNodeID;
+    if (n == null) {
+        whenFinished();
+        return;
+    }
+    
     if (n.length != undefined) {
         getNode(n, function(f) {
             forEachLink(f.node, forEach, whenFinished);

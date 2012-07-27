@@ -54,26 +54,6 @@
     </head>
 
     <body>
-        <div id="sidebar" style="display:none">            
-        <!--
-            <div id="sidebarTop"><button>Nodes</button></div>
-            <div id="nodelist"></div>
-            <div id="sidebarBottom">
-                <select id="bulkOperation">
-                    <option>Synthesize</option>
-                    <option>Delete</option>
-                    <option>Export</option>
-                </select> 
-                <button onclick="javascript:applyBulkOperations();">Apply</button>
-                <button onClick="javascript:sideBarSelectAll();">Select All</button>
-            </div>
-        -->
-        </div>
-        
-
-
-
-
         <div id="_Top" class="menu">
 
             <ul class="sf-menu">
@@ -95,7 +75,7 @@
                     <button onclick="javascript:toggleEdit();"><img class="topMenuButton" src="/icons/simplistica/page_edit.png" alt="Edit"/></button>
                 </li>
                 <li id="NeighborhoodButton">
-                    <button onclick="toggleSidebar();"><img class="topMenuButton" src="/icons/webapp/Info.png" alt="Metadata"/></button>
+                    <a href="/nodes"><img class="topMenuButton" src="/icons/webapp/Info.png" alt="Metadata"/></a>
                     <ul>
                         <li><a href="javascript:graphIt();" class="tooltip"><img class="topMenuButton" src="/icons/webapp/LineChart.png" alt="Share"/>Graph</a></li>
                     </ul>
@@ -191,6 +171,7 @@
             <div id="_ContentBar" style="width: 100%; display:none"></div>
             <div id="_Content" contentEditable="false" onMouseOver='onContentMouseOver(this);' onMouseOut='onContentMouseOut(this);'>
             </div>
+            <div id="_ContentMeta"></div>
             <div id="nodeLinks"></div>
             <div id="EditBottom" style="display:none">
                 <section id="Edit">

@@ -256,9 +256,19 @@ function editNode(id) {
 }
 
 function setNodeTo(x) {
+    window.history.pushState(x._id, '', '/node/' + x._id);
     _n(x);
     showNode(0);
     updateLinks();
+}
+
+function setNode(id, f) {
+    $.getJSON('/node/' + id + '/json', function(data) {
+        setNodeTo(data);
+            
+        if (f!=null)
+            f();
+    });        
 }
 
 
@@ -337,27 +347,6 @@ function setList(l) {
     
 }
 
-function setNodeList() {
-    showNode(-1);
-    
-    now.ready(function(){
-
-        now.forEachNode({}, function(data) {
-            var title = data.node.title;
-            if (title == undefined) title = data._id;
-            if (title.indexOf('\n')!=-1)
-                title = title.split('\n')[0];
-            append('<li><a href="/node/' + data._id + '">' + title + "</a></i>");
-        });
-    });
-}
-
-function getContent() { return $('#_Content').html(); }
-function getContentText() { return $('#_Content').text(); }
-
-function append(h) {
-    $('#_Content').append(h);
-}
 
 var sections = 0;
 function newSection() {
@@ -418,25 +407,36 @@ function addSentencized() {
     
 }
             
-function browseNodes() {
+function showNodes() {
+    clearMeta();
     now.ready(function(){
-       $('#nodelist').html('');
        
        now.forEachNode({}, function(f) {
-           var id = f._id;
-           var tx = f.node.title + '';
-           if (tx.length == 0)
-               tx = id;
-           
-           var t = '<div class="nodeWideIcon"> <input id="sbcheckbox.' + id + '" value="" type="checkbox"> <a href="javascript:setNodeById(\'' + id + '\')">' + tx + "</a></div>";
-           $('#nodelist').append(t);
+           addLink(f);
             
        });
     });                
 }
+
+function addLink(n, reasons) {
+    var id = n._id;
+    var tx = n.node.title + '';
+    if (tx.length == 0)
+        tx = id;
+//    n.append('<a href="/node/' + node._id + '">' + node.node.title + '</a>');
+//    n.append('<ul>');
+//        for (var i = 0; i < reasons.length; i++)
+//            n.append('<li>' + reasons[i] + '</li>');
+//    n.append('</ul>');
+//    n.append('<hr/>');
+
+    var t = '<div class="nodeWideIcon"> <input id="sbcheckbox.' + id + '" value="" type="checkbox"> <a href="/node/' + id + '">' + tx + "</a></div>";
+    appendMeta(t);
+}
+
 function browseWhere() {
     //now.ready(function(){
-       $('#nodelist').load('/browse.map.html');
+       $('#_Content').load('/browse.map.html');
        
 //       now.forEachNode(function(f) {
 //           var id = f._id;

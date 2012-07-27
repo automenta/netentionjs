@@ -24,6 +24,7 @@ function addRSS(url, f) {
         articles.forEach(function (article){
           //var nodeID = article.guid;
           var nodeID = article.guid;
+          nodeID = nodeID.replace(/\//g, '_')
           
           //article.content = article.title + '\n' + article.description;
           article.content = article.title + '<br/>' + article.description;

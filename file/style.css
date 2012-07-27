@@ -26,13 +26,8 @@ root {
     width: 73%;
     float: right;
 }
-#sidebar {
-     height: 100%;
-     position: fixed;
-}
 
 #_Content {
-    opacity: 0;
     clear:both;
     -webkit-transition: opacity 0.5s ease-in-out; //for chrome, safari
     -moz-transition: opacity 0.5s ease-in-out; //for mozilla firefox

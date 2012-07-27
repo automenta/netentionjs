@@ -102,14 +102,14 @@ function forEachNodeOLD(f/*(n)*/) {
 }
 
 function finalizeNode(n) {
-    var maxTitleLength = 32;
+    var maxTitleLength = 64;
                         
     var title = n.node.title;
     if (title == undefined) {
           title = n.node.content;
           if (title == undefined) title = '';
           if (title.length> maxTitleLength) 
-              title = title.substring(0, maxTitleLength-1);
+              title = title.substring(0, maxTitleLength-1) + '&hellip;';
     }
     n.node.title = title;
     return n;   
@@ -133,7 +133,10 @@ function forEachNode(query, forEach, whenFinished) {
 function getNode(nodeID, f) {
     db.collection('nodes', function(err, c) {
         c.findOne({ '_id': nodeID}, function(err, node) {
-            if (err==null) {
+            if (node == null) {
+                console.log('Unknown node: ' + nodeID);
+            }
+            else if (err==null) {
                 node._id = nodeID;
                 f(node);
             }

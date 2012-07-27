@@ -310,23 +310,6 @@ function goNext(f) {
         stopAutospeech();
 }
     
-function setNode(id, f) {
-    $("#_Content").css({
-        opacity: 0
-    });
-    $.getJSON('/node/' + id + '/json', function(data) {
-        nodes = []
-        _n(data);
-        window.history.pushState(id, '', '/node/' + id);
-        showNode(0);
-            
-        if (f!=null)
-            f();
-    });    
-
-//window.location = '/node/' + id;
-        
-}
 
 function highlightButton(i, highlighted) {
     var x = $('#' + i);
@@ -607,19 +590,28 @@ function ensureContentSaved(bypassConfirmation) {
  
 }
 
+
+function getContent() { return $('#_Content').html(); }
+function getContentText() { return $('#_Content').text(); }
+
+function append(h) {
+    $('#_Content').append(h);
+}
+function appendMeta(h) {
+    $('#_ContentMeta').append(h);
+}
+function clearMeta() {
+    $('#_ContentMeta').html('');
+}
+
+
 function updateLinks() {
     if (currentNode==null) return;
     
-    var n = $('#nodeLinks');
-    n.html('');
+    clearMeta();
     now.ready(function(){
         now.forEachLink(nodeID, function(node, reasons) {
-            n.append('<a href="/node/' + node._id + '">' + node.node.title + '</a>');
-            n.append('<ul>');
-                for (var i = 0; i < reasons.length; i++)
-                    n.append('<li>' + reasons[i] + '</li>');
-            n.append('</ul>');
-            n.append('<hr/>');
+            addLink(node, reasons);            
         }, function() {
         });
     });
@@ -808,28 +800,7 @@ $(document).ready(function(){
 });
 
 
-var showingSidebar = false;
-function sidebar(b) {
-    if (b) {
-        $('#_Panel').removeClass('PanelWide');
-        $('#_Panel').addClass('PanelNarrow');
-        $('#_Top').css('right', '0');
-        $('#sidebar').css('max-width', '25%');
-        $('#sidebar').css('float', 'left');
-        $('#sidebar').load('/browse.html');
-        $('#sidebar').show();
-    }
-    else {       
-        $('#sidebar').hide();
-        $('#_Panel').removeClass('PanelNarrow');
-        $('#_Panel').addClass('PanelWide');
-        $('#_Top').css('right', '20%');
-    }
-    showingSidebar = b;
-}            
-function toggleSidebar() {
-    sidebar(!showingSidebar);
-}
+
 function sideBarSelectAll() {
     $('[id^=sbcheckbox]').each(function(){
         this.checked = !this.checked;

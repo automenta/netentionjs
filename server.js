@@ -62,7 +62,7 @@ function getAgentID() {
 }
 
 useTemplate('/nodes', 'node.html', function(data, req, res) {
-    sendAgentPage(data, res, getAgentID(), 'setNodeList();');
+    sendAgentPage(data, res, getAgentID(), 'showNodes();');
 });
 
 
@@ -94,7 +94,7 @@ function sendAgentPage(data, res, agentID, onStartCode) {
 
 useTemplate('/new', 'node.html', function(data, req, res) {
     var x = { _id: netention.randomUUID(), content: '' };
-    sendAgentPage(data, res, getAgentID(), 'setNodeTo(\'' + JSON.stringify(x) + '\');');
+    sendAgentPage(data, res, getAgentID(), 'setNodeTo(' + JSON.stringify(x) + ');setEditable(true);');
 });
 
 //useTemplate('/agent/:agent/:node', 'agent.html', function(data, req, res) {
@@ -153,7 +153,7 @@ useTemplate('/node/:node', 'node.html', function(data, req, res) {
     });        
 });
 useTemplate('/', 'node.html', function(data, req, res) {
-    sendAgentPage(data, res, getAgentID(), 'sidebar(true);');
+    sendAgentPage(data, res, getAgentID(), 'showNodes();');
 });
 
 server.get('/node/:node/json', function(req,res) {

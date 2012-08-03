@@ -1,4 +1,5 @@
 var apricot = require('apricot').Apricot;
+var request = require('request');
 
 var mongo = require('mongodb'),
   Server = mongo.Server,
@@ -265,11 +266,14 @@ function addSentencized(urlOrText, f) {
            //str=str.replace(/\r/g, " ");
            //str=str.replace(/\t/g, " ");
            str=str.replace(/&nbsp;/gi, " ");
-           str=str.replace(/<br>/gi, "\n");
+           str=str.replace(/\. /gi, ".\n");
+           str=str.replace(/\? /gi, "?\n");
+           str=str.replace(/\! /gi, "!\n");
+           str=str.replace(/<br.*>/gi, "\n");
            str=str.replace(/<p.*>/gi, "\n");
            str=str.replace(/<a.*href="(.*?)".*>(.*?)<\/a>/gi, " $2 [$1] ");
-           str=str.replace(/<(?:.|\s)*?>/g, "");
-                          
+           str=str.replace(/<(.*?)>/g, "");
+
            var linesPreFilter = str.split("\n");
            var slines = [];
            var i;
@@ -283,7 +287,7 @@ function addSentencized(urlOrText, f) {
            var lines = [];
            for (i = 0; i < slines.length; i++) {
                 var nodeID = rootNode + '.' + i;
-                var agentID = 'sentencize';
+                //var agentID = 'sentencize';
                 var a = { content: slines[i] };
                 if (i > 0) {
                     a.previous = rootNode + '.' + (i-1);
@@ -307,11 +311,23 @@ function addSentencized(urlOrText, f) {
    }
    
    if (urlOrText.indexOf('http://')==0) {
-       rootNode = urlOrText;
-       rootNode = rootNode.replace(/http:\/\//g, "");
-       rootNode = rootNode.replace(/\//g, "_");
-       //rootNode = netention.randomUUID();
-       apricot.open(urlOrText, p, true);
+        rootNode = urlOrText;
+        rootNode = rootNode.replace(/http:\/\//g, "");
+        rootNode = rootNode.replace(/\//g, "_");
+        
+        request({
+            url: urlOrText,
+            followAllRedirects: true            
+          }, 
+          function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+                apricot.parse(body, p);
+            }
+            else {
+                console.log('add_sentencized ERROR');
+                console.log(urlOrText + ': '  + error);
+            }
+        });        
    }
    else {
        var summaryLength = 16;

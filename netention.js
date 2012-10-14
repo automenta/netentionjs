@@ -10,7 +10,6 @@ var mongoServer = new Server('localhost', 27017, {auto_reconnect: true});
 var db = new Db('netention', mongoServer);
 
 
-
 function start(f) {
     db.open(function(err, db) {
       if(!err) {
@@ -75,32 +74,6 @@ function updateNode(nodeID, node, callback) {
     return nodeID;
 }
 
-function forEachNodeOLD(f/*(n)*/) {
-   db.collection('nodes', function(err, c) {
-       c.find( { 'node' : { $exists : true } } ).toArray(function(err, results) {
-           if (results!=null) {
-              for (var i = 0; i < results.length; i++) {
-                  var r = results[i];
-                  var r2 = { };                  
-                  r2._id = r._id;
-                  
-                  var maxTitleLength = 32;
-                  var title = r.node.title;
-                  if (title == undefined) {
-                        title = r.node.content;
-                        if (title == undefined) title = '';
-                        if (title.length> maxTitleLength) 
-                            title = title.substring(0, maxTitleLength-1);
-                  }
-   
-                  r2.node = { 'title': title  };
-                  f(r2);
-              }
-           }
-       });
-   });
-    
-}
 
 function finalizeNode(n) {
     var maxTitleLength = 64;
@@ -351,3 +324,34 @@ exports.forEachLink = forEachLink;
 exports.addSentencized = addSentencized;
 exports.parseContent = parseContent;
 exports.reset = reset;
+
+
+
+
+/*
+function forEachNodeOLD(f) {
+   db.collection('nodes', function(err, c) {
+       c.find( { 'node' : { $exists : true } } ).toArray(function(err, results) {
+           if (results!=null) {
+              for (var i = 0; i < results.length; i++) {
+                  var r = results[i];
+                  var r2 = { };                  
+                  r2._id = r._id;
+                  
+                  var maxTitleLength = 32;
+                  var title = r.node.title;
+                  if (title == undefined) {
+                        title = r.node.content;
+                        if (title == undefined) title = '';
+                        if (title.length> maxTitleLength) 
+                            title = title.substring(0, maxTitleLength-1);
+                  }
+   
+                  r2.node = { 'title': title  };
+                  f(r2);
+              }
+           }
+       });
+   });
+    
+}*/
